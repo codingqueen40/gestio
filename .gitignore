@@ -1,0 +1,37 @@
+# ===== SENSITIVE FILES — NEVER COMMIT =====
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets/
+
+# ===== macOS =====
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# ===== Editors / IDE =====
+.vscode/
+.idea/
+# Private documentation (documents passwords, personal use only)
+INSTRUCTIONS.md
+*.swp
+*.swo
+*~
+
+# ===== Logs and caches =====
+*.log
+logs/
+cache/
+tmp/
+
+# ===== Dependencies (if you add Composer or npm later) =====
+vendor/
+node_modules/
+composer.lock
+
+# ===== Local Docker volumes (just in case) =====
+mysql_data/

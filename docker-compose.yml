@@ -1,0 +1,58 @@
+# BASE FILE: contains what is shared between dev and prod environments.
+# Will be merged with override.yml in dev, or with prod.yml in prod.
+services:
+  php:
+    build: . # build the image from your local Dockerfile
+    container_name: gestio_php
+    restart: unless-stopped # auto-restart on crash, unless you stop it yourself
+    volumes:
+      - ./public:/var/www/html # mount your code into the container (live reload)
+    environment:
+      DB_HOST: mysql # name of the MySQL service (NOT localhost!)
+      DB_NAME: ${MYSQL_DATABASE} # injected from .env
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy # wait until MySQL responds to ping before starting PHP
+    networks:
+      - gestio_network # private isolated network, not reachable from the Internet
+
+  mysql:
+    image: mysql:8.4 # LTS version, supported until April 2032
+    container_name: gestio_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql # persistent volume for your data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql # runs init.sql on first startup
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - gestio_network
+    # NO "ports:" here → MySQL is NOT exposed to the outside world by default
+    # The dev override will add port 3306 for your local convenience
+
+volumes:
+  mysql_data: # Docker volume, survives 'down', deleted with 'down -v'
+
+networks:
+  gestio_network:
+    driver: bridge # isolated bridge network between containers
