@@ -29,7 +29,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql # persistent volume for your data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql # runs init.sql on first startup
+      - ./db/gestio.sql:/docker-entrypoint-initdb.d/init.sql # runs gestio.sql (English schema) on first startup
     healthcheck:
       test:
         [

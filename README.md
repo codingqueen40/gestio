@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="logo-gestio.png" alt="Gestio logo" width="150"/>
+<img src="/public/assets/images/logo-gestio.png" alt="Gestio logo" width="150"/>
 
 # Gestio — Expense Tracker
 
@@ -19,22 +19,24 @@
 
 ## Table of Contents
 
-- [About](#about)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Database Schema](#database-schema)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [URLs](#urls)
-- [Environment Variables](#environment-variables)
-- [Project Structure](#project-structure)
-- [Development Workflow](#development-workflow)
-- [Production Deployment](#production-deployment)
-- [Useful zsh Aliases](#useful-zsh-aliases)
-- [Troubleshooting](#troubleshooting)
-- [Security Considerations](#security-considerations)
-- [License](#license)
-- [About the Author](#about-the-author)
+- [Gestio — Expense Tracker](#gestio--expense-tracker)
+  - [Table of Contents](#table-of-contents)
+  - [About](#about)
+  - [Tech Stack](#tech-stack)
+  - [Architecture](#architecture)
+  - [Database Schema](#database-schema)
+  - [Prerequisites](#prerequisites)
+  - [Quick Start](#quick-start)
+  - [URLs](#urls)
+  - [Environment Variables](#environment-variables)
+  - [Project Structure](#project-structure)
+  - [Development Workflow](#development-workflow)
+  - [Production Deployment](#production-deployment)
+  - [Useful zsh Aliases](#useful-zsh-aliases)
+  - [Troubleshooting](#troubleshooting)
+  - [Security Considerations](#security-considerations)
+  - [License](#license)
+  - [About the Author](#about-the-author)
 
 ---
 
