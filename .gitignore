@@ -18,6 +18,7 @@ Icon
 .idea/
 # Private documentation (documents passwords, personal use only)
 INSTRUCTIONS.md
+db/
 *.swp
 *.swo
 *~
