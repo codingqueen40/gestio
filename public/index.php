@@ -43,7 +43,7 @@ foreach ($expenses as $d) {
             class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
             <div class="col-md-3 mb-2 mb-md-0"> <a href="/"
                     class="d-inline-flex link-body-emphasis text-decoration-none">
-                    <img src="/assets/images/logo-gestio-2.png"
+                    <img src="/assets/images/logo_gestio_cropped.png"
                         alt="logo Gestio" width="200">
                 </a>
             </div>
@@ -70,6 +70,30 @@ foreach ($expenses as $d) {
         </div>
     </nav>
 
+    <div class="container">
+        <main class="container">
+            <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+                <div class="col-10 col-sm-8 col-lg-6"> <img
+                        src="assets/images/logo_gestio_cropped.png"
+                        class="d-block mx-lg-auto img-fluid" alt="logo Gestio"
+                        width="700" loading="lazy"> </div>
+                <div class="col-lg-6">
+                    <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">
+                        Avec Gestio, gère tes dépenses facilement !</h1>
+                    <p class="lead">Très simple d'utilisation, administre tes
+                        dépenses en quelques
+                        clics.</p>
+                    <div
+                        class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <button type="button"
+                            class="btn btn-primary btn-lg px-4 me-md-2">Primary</button>
+                        <button type="button"
+                            class="btn btn-outline-secondary btn-lg px-4">Default</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
     <div class="container">
 
         <div class="alert alert-success">
