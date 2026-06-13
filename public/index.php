@@ -1,5 +1,5 @@
 <?php
-require 'config.php';
+require __DIR__ . '/../src/config.php';
 
 $categories = $pdo->query("SELECT * FROM category ORDER BY name")->fetchAll();
 
