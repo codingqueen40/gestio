@@ -6,7 +6,8 @@ services:
     container_name: gestio_php
     restart: unless-stopped # auto-restart on crash, unless you stop it yourself
     volumes:
-      - ./public:/var/www/html # mount your code into the container (live reload)
+      - ./public:/var/www/html/public # web root (live reload)
+      - ./src:/var/www/html/src # app code, kept OUTSIDE the document root
     environment:
       DB_HOST: mysql # name of the MySQL service (NOT localhost!)
       DB_NAME: ${MYSQL_DATABASE} # injected from .env

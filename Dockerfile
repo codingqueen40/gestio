@@ -7,6 +7,13 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql \
 # Enable mod_rewrite (useful for clean URLs later)
 RUN a2enmod rewrite
 
+# Apache serves the public/ subfolder only.
+# Application code (config, templates, classes) lives in /var/www/html/src,
+# OUTSIDE the document root, so it is never reachable via a URL.
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
 # Default PHP settings = PRODUCTION-SAFE.
 # display_errors stays OFF: no error (nor SQL message) is ever shown to the visitor.
 # Errors are only logged. Dev re-enables display via php/dev.ini (mounted by the override).

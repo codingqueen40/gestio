@@ -6,7 +6,8 @@ services:
     ports:
       - "${PHP_PORT:-8080}:80" # expose PHP on your Mac (dev only)
     volumes:
-      - ./public:/var/www/html # code mounted (live reload) — same as base
+      - ./public:/var/www/html/public # web root (live reload) — same as base
+      - ./src:/var/www/html/src # app code, kept OUTSIDE the document root
       - ./php/dev.ini:/usr/local/etc/php/conf.d/zzz-dev.ini:ro # re-enable display_errors IN DEV only
     environment:
       APP_ENV: development # PHP can read this variable to adapt its behavior
