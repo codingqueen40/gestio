@@ -1,9 +1,13 @@
 <?php
+require_once __DIR__ . '/../libs/auth.php';
+
 $mainMenu = [
-    'index.php' => 'Home',
-    'about.php' => 'About',
-    'contact.php' => 'Contact'
+    '/'      => 'Home',
+    '/about' => 'About',
 ];
+
+// Chemin courant fourni par le front controller (fallback sur '/').
+$currentPage = $currentPath ?? '/';
 
 
 ?>
@@ -39,17 +43,24 @@ $mainMenu = [
             <ul
                 class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
                 <?php foreach ($mainMenu as $page => $title) : ?>
+                <?php $isActive = $page === $currentPage; ?>
 
-                <li><a href="<?= $page ?>"
-                        class="nav-link px-2 link-secondary"><?=$title ?></a>
+                <li class="nav-item"><a href="<?= $page ?>"
+                        class="nav-link px-2 <?= $isActive ? 'active' : 'link-secondary' ?>"
+                        <?= $isActive ? 'aria-current="page"' : '' ?>><?= $title ?></a>
                 </li>
 
                 <?php endforeach; ?>
 
             </ul>
-            <div class="col-md-3 text-end"> <button type="button"
-                    class="btn btn-outline-primary me-2">Login</button> <button
-                    type="button" class="btn btn-primary">Sign-up</button>
+            <div class="col-md-3 text-end">
+                <?php if (isLoggedIn()): ?>
+                <span class="me-2">Bonjour <?= htmlspecialchars(currentUsername()) ?></span>
+                <a href="/logout" class="btn btn-outline-danger">Logout</a>
+                <?php else: ?>
+                <a href="/login" class="btn btn-outline-primary me-2">Login</a>
+                <a href="/signup" class="btn btn-primary">Sign-up</a>
+                <?php endif; ?>
             </div>
         </header>
 
