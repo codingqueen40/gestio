@@ -36,3 +36,4 @@ composer.lock
 
 # ===== Local Docker volumes (just in case) =====
 mysql_data/
+tickets-kanban.md
