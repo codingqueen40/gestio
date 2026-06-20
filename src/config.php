@@ -5,6 +5,15 @@
  * No sensitive value is stored in this file — it can be committed safely.
  */
 
+// Session démarrée une seule fois, avec des cookies durcis.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start([
+        'cookie_httponly' => true,                                // pas d'accès JS au cookie
+        'cookie_samesite' => 'Lax',                               // anti-CSRF de base
+        'cookie_secure'   => (getenv('APP_ENV') === 'production'), // HTTPS en prod
+    ]);
+}
+
 $db_host = getenv('DB_HOST') ?: 'mysql';
 $db_name = getenv('DB_NAME');
 $db_user = getenv('DB_USER');
