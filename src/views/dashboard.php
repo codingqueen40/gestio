@@ -44,10 +44,56 @@
     </div>
 
     <div class="card mb-4">
-        <div
-            class="card-header d-flex justify-content-between align-items-center">
-            <strong>Dernieres depenses</strong>
-            <a href="/depenses/ajouter" class="btn btn-sm btn-primary">+ Ajouter</a>
+        <div class="card-header">
+            <div
+                class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Dernieres depenses</strong>
+                <a href="/depenses/ajouter" class="btn btn-sm btn-primary">+ Ajouter</a>
+            </div>
+            <form method="get" action="/" class="row g-2 align-items-end">
+                <div class="col-auto">
+                    <label for="month" class="form-label small mb-1">Mois</label>
+                    <select id="month" name="month"
+                        class="form-select form-select-sm">
+                        <option value="">Tous les mois</option>
+                        <?php foreach ($months as $m): ?>
+                        <option value="<?= htmlspecialchars($m) ?>"
+                            <?= $m === $filterMonth ? 'selected' : '' ?>>
+                            <?= htmlspecialchars(substr($m, 5, 2) . '/' . substr($m, 0, 4)) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label for="category"
+                        class="form-label small mb-1">Catégorie</label>
+                    <select id="category" name="category"
+                        class="form-select form-select-sm">
+                        <option value="">Toutes</option>
+                        <?php foreach ($categories as $cat): ?>
+                        <option value="<?= (int) $cat['id_category'] ?>"
+                            <?= (string) $cat['id_category'] === $filterCategory ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($cat['name']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit"
+                        class="btn btn-sm btn-outline-primary">Filtrer</button>
+                    <?php if ($hasFilter): ?>
+                    <a href="/" class="btn btn-sm btn-link">Réinitialiser</a>
+                    <?php endif; ?>
+                </div>
+                <?php if ($hasFilter): ?>
+                <div class="col-12">
+                    <small class="text-muted"><?= count($filtered) ?>
+                        dépense(s) · Total filtré :
+                        <?= number_format($filteredTotal, 2, ',', ' ') ?>
+                        EUR</small>
+                </div>
+                <?php endif; ?>
+            </form>
         </div>
         <div class="table-responsive">
             <table class="table table-hover mb-0">
@@ -61,16 +107,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (count($expenses) === 0): ?>
+                    <?php if (count($filtered) === 0): ?>
                     <tr>
                         <td colspan="5" class="text-center text-muted py-4">
+                            <?php if ($hasFilter): ?>
+                            Aucune dépense ne correspond à ce filtre.
+                            <a href="/">Réinitialiser</a>.
+                            <?php else: ?>
                             Aucune dépense pour l'instant.
                             <a href="/depenses/ajouter">Ajoute ta première
                                 dépense</a>.
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endif; ?>
-                    <?php foreach ($expenses as $d): ?>
+                    <?php foreach ($filtered as $d): ?>
                     <tr>
                         <td><?= date('d/m/Y', strtotime($d['expense_date'])) ?>
                         </td>
