@@ -2,8 +2,9 @@
 require_once __DIR__ . '/../libs/auth.php';
 
 $mainMenu = [
-    '/'      => 'Home',
-    '/about' => 'About',
+    '/'        => 'Home',
+    '/about'   => 'About',
+    '/contact' => 'Contact',
 ];
 
 // Chemin courant fourni par le front controller (fallback sur '/').
