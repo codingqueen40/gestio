@@ -19,5 +19,8 @@ return [
     'GET /depenses/ajouter'    => 'expense_add.php',
     'POST /depenses/ajouter'   => 'expense_add.php',
 
+    'GET /depenses/modifier'   => 'expense_edit.php',
+    'POST /depenses/modifier'  => 'expense_edit.php',
+
     'POST /depenses/supprimer' => 'expense_delete.php',
 ];

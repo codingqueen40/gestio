@@ -11,6 +11,9 @@
     <?php if (isset($_GET['added'])): ?>
     <div class="alert alert-success">Dépense ajoutée avec succès.</div>
     <?php endif; ?>
+    <?php if (isset($_GET['updated'])): ?>
+    <div class="alert alert-success">Dépense modifiée.</div>
+    <?php endif; ?>
     <?php if (isset($_GET['deleted'])): ?>
     <div class="alert alert-success">Dépense supprimée.</div>
     <?php endif; ?>
@@ -84,6 +87,8 @@
                             <?= number_format($d['amount'], 2, ',', ' ') ?>
                             EUR</td>
                         <td class="text-end">
+                            <a href="/depenses/modifier?id=<?= (int) $d['id_expense'] ?>"
+                                class="btn btn-sm btn-outline-secondary">Modifier</a>
                             <form action="/depenses/supprimer" method="post"
                                 onsubmit="return confirm('Supprimer cette dépense ?');"
                                 class="d-inline">
