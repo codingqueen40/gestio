@@ -16,6 +16,8 @@ return [
 
     'GET /about'               => 'about.php',
 
+    'GET /contact'             => 'contact.php',
+
     'GET /depenses/ajouter'    => 'expense_add.php',
     'POST /depenses/ajouter'   => 'expense_add.php',
 
