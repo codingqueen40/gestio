@@ -11,6 +11,9 @@
     <?php if (isset($_GET['added'])): ?>
     <div class="alert alert-success">Dépense ajoutée avec succès.</div>
     <?php endif; ?>
+    <?php if (isset($_GET['updated'])): ?>
+    <div class="alert alert-success">Dépense modifiée.</div>
+    <?php endif; ?>
     <?php if (isset($_GET['deleted'])): ?>
     <div class="alert alert-success">Dépense supprimée.</div>
     <?php endif; ?>
@@ -41,10 +44,74 @@
     </div>
 
     <div class="card mb-4">
-        <div
-            class="card-header d-flex justify-content-between align-items-center">
-            <strong>Dernieres depenses</strong>
-            <a href="/depenses/ajouter" class="btn btn-sm btn-primary">+ Ajouter</a>
+        <div class="card-header">
+            <strong>Répartition par catégorie</strong>
+            <?php if ($hasFilter): ?>
+            <span class="text-muted small">(vue filtrée)</span>
+            <?php endif; ?>
+        </div>
+        <div class="card-body">
+            <?php if (count($byCategory) === 0): ?>
+            <p class="text-muted mb-0">Aucune donnée à afficher.</p>
+            <?php else: ?>
+            <div style="max-width: 420px; margin: 0 auto;">
+                <canvas id="categoryChart" height="300"></canvas>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <div
+                class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Dernieres depenses</strong>
+                <a href="/depenses/ajouter" class="btn btn-sm btn-primary">+ Ajouter</a>
+            </div>
+            <form method="get" action="/" class="row g-2 align-items-end">
+                <div class="col-auto">
+                    <label for="month" class="form-label small mb-1">Mois</label>
+                    <select id="month" name="month"
+                        class="form-select form-select-sm">
+                        <option value="">Tous les mois</option>
+                        <?php foreach ($months as $m): ?>
+                        <option value="<?= htmlspecialchars($m) ?>"
+                            <?= $m === $filterMonth ? 'selected' : '' ?>>
+                            <?= htmlspecialchars(substr($m, 5, 2) . '/' . substr($m, 0, 4)) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label for="category"
+                        class="form-label small mb-1">Catégorie</label>
+                    <select id="category" name="category"
+                        class="form-select form-select-sm">
+                        <option value="">Toutes</option>
+                        <?php foreach ($categories as $cat): ?>
+                        <option value="<?= (int) $cat['id_category'] ?>"
+                            <?= (string) $cat['id_category'] === $filterCategory ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($cat['name']) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit"
+                        class="btn btn-sm btn-outline-primary">Filtrer</button>
+                    <?php if ($hasFilter): ?>
+                    <a href="/" class="btn btn-sm btn-link">Réinitialiser</a>
+                    <?php endif; ?>
+                </div>
+                <?php if ($hasFilter): ?>
+                <div class="col-12">
+                    <small class="text-muted"><?= count($filtered) ?>
+                        dépense(s) · Total filtré :
+                        <?= number_format($filteredTotal, 2, ',', ' ') ?>
+                        EUR</small>
+                </div>
+                <?php endif; ?>
+            </form>
         </div>
         <div class="table-responsive">
             <table class="table table-hover mb-0">
@@ -58,16 +125,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (count($expenses) === 0): ?>
+                    <?php if (count($filtered) === 0): ?>
                     <tr>
                         <td colspan="5" class="text-center text-muted py-4">
+                            <?php if ($hasFilter): ?>
+                            Aucune dépense ne correspond à ce filtre.
+                            <a href="/">Réinitialiser</a>.
+                            <?php else: ?>
                             Aucune dépense pour l'instant.
                             <a href="/depenses/ajouter">Ajoute ta première
                                 dépense</a>.
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endif; ?>
-                    <?php foreach ($expenses as $d): ?>
+                    <?php foreach ($filtered as $d): ?>
                     <tr>
                         <td><?= date('d/m/Y', strtotime($d['expense_date'])) ?>
                         </td>
@@ -84,6 +156,8 @@
                             <?= number_format($d['amount'], 2, ',', ' ') ?>
                             EUR</td>
                         <td class="text-end">
+                            <a href="/depenses/modifier?id=<?= (int) $d['id_expense'] ?>"
+                                class="btn btn-sm btn-outline-secondary">Modifier</a>
                             <form action="/depenses/supprimer" method="post"
                                 onsubmit="return confirm('Supprimer cette dépense ?');"
                                 class="d-inline">
@@ -115,5 +189,42 @@
     </div>
 
 </div>
+
+<?php if (count($byCategory) > 0): ?>
+<?php
+// Encodage sûr pour injection dans <script> (évite toute cassure </script>).
+$jsonFlags  = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+$chartData  = [
+    'labels' => array_column($byCategory, 'name'),
+    'data'   => array_map(static fn ($c) => round($c['total'], 2), $byCategory),
+    'colors' => array_column($byCategory, 'color'),
+];
+?>
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    (function () {
+        const chart = <?= json_encode($chartData, $jsonFlags) ?>;
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: chart.labels,
+                datasets: [{ data: chart.data, backgroundColor: chart.colors }]
+            },
+            options: {
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: (c) => `${c.label}: ` +
+                                c.parsed.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
+                        }
+                    }
+                }
+            }
+        });
+    })();
+</script>
+<?php endif; ?>
 
 <?php require __DIR__ . '/../templates/footer.php'; ?>

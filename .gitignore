@@ -18,7 +18,9 @@ Icon
 .idea/
 # Private documentation (documents passwords, personal use only)
 INSTRUCTIONS.md
-db/
+# Local DB dumps / data stay ignored, but the canonical schema is versioned (#20)
+db/*
+!db/gestio.sql
 *.swp
 *.swo
 *~
