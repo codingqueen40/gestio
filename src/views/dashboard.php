@@ -45,6 +45,24 @@
 
     <div class="card mb-4">
         <div class="card-header">
+            <strong>Répartition par catégorie</strong>
+            <?php if ($hasFilter): ?>
+            <span class="text-muted small">(vue filtrée)</span>
+            <?php endif; ?>
+        </div>
+        <div class="card-body">
+            <?php if (count($byCategory) === 0): ?>
+            <p class="text-muted mb-0">Aucune donnée à afficher.</p>
+            <?php else: ?>
+            <div style="max-width: 420px; margin: 0 auto;">
+                <canvas id="categoryChart" height="300"></canvas>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
             <div
                 class="d-flex justify-content-between align-items-center mb-2">
                 <strong>Dernieres depenses</strong>
@@ -171,5 +189,42 @@
     </div>
 
 </div>
+
+<?php if (count($byCategory) > 0): ?>
+<?php
+// Encodage sûr pour injection dans <script> (évite toute cassure </script>).
+$jsonFlags  = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+$chartData  = [
+    'labels' => array_column($byCategory, 'name'),
+    'data'   => array_map(static fn ($c) => round($c['total'], 2), $byCategory),
+    'colors' => array_column($byCategory, 'color'),
+];
+?>
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    (function () {
+        const chart = <?= json_encode($chartData, $jsonFlags) ?>;
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: chart.labels,
+                datasets: [{ data: chart.data, backgroundColor: chart.colors }]
+            },
+            options: {
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: (c) => `${c.label}: ` +
+                                c.parsed.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
+                        }
+                    }
+                }
+            }
+        });
+    })();
+</script>
+<?php endif; ?>
 
 <?php require __DIR__ . '/../templates/footer.php'; ?>

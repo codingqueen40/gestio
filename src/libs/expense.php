@@ -125,6 +125,29 @@ function filterExpenses(array $expenses, ?string $month = null, ?int $categoryId
     }));
 }
 
+/**
+ * Totaux par catégorie pour une liste de dépenses.
+ * Retourne [['name' => , 'color' => , 'total' => ], ...] trié par total décroissant,
+ * uniquement pour les catégories réellement présentes. Pratique pour un graphique.
+ */
+function sumByCategory(array $expenses): array
+{
+    $byCat = [];
+    foreach ($expenses as $d) {
+        $id = (int) $d['id_category'];
+        if (!isset($byCat[$id])) {
+            $byCat[$id] = [
+                'name'  => $d['category_name'] ?? 'Sans catégorie',
+                'color' => $d['category_color'] ?? '#6c757d',
+                'total' => 0.0,
+            ];
+        }
+        $byCat[$id]['total'] += (float) $d['amount'];
+    }
+    usort($byCat, static fn ($a, $b) => $b['total'] <=> $a['total']);
+    return $byCat;
+}
+
 /** Somme totale d'une liste de dépenses. */
 function sumExpenses(array $expenses): float
 {

@@ -32,4 +32,7 @@ $filtered      = filterExpenses(
 $filteredTotal = sumExpenses($filtered);
 $hasFilter     = $filterMonth !== '' || $filterCategory !== '';
 
+// Répartition par catégorie pour le graphique (suit la liste filtrée affichée).
+$byCategory    = sumByCategory($filtered);
+
 require __DIR__ . '/../views/dashboard.php';
