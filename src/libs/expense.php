@@ -30,6 +30,18 @@ function getExpensesByUser(PDO $pdo, int $userId): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Retourne une dépense précise appartenant à l'utilisateur, ou null.
+ * Le filtre id_user empêche de lire la dépense d'un autre compte.
+ */
+function getExpenseById(PDO $pdo, int $userId, int $expenseId): ?array
+{
+    $stmt = $pdo->prepare("SELECT * FROM expense WHERE id_expense = :id AND id_user = :uid");
+    $stmt->execute([':id' => $expenseId, ':uid' => $userId]);
+    $row = $stmt->fetch();
+    return $row === false ? null : $row;
+}
+
 /** Ajoute une dépense pour un utilisateur. */
 function addExpense(PDO $pdo, int $userId, string $title, float $amount, string $date, int $categoryId): bool
 {
@@ -44,6 +56,29 @@ function addExpense(PDO $pdo, int $userId, string $title, float $amount, string 
         ':category' => $categoryId,
         ':uid'      => $userId,
     ]);
+}
+
+/**
+ * Met à jour une dépense appartenant à l'utilisateur.
+ * Le filtre id_user empêche de modifier la dépense d'un autre compte.
+ * Retourne true si une ligne a réellement été modifiée.
+ */
+function updateExpense(PDO $pdo, int $userId, int $expenseId, string $title, float $amount, string $date, int $categoryId): bool
+{
+    $stmt = $pdo->prepare("
+        UPDATE expense
+        SET amount = :amount, title = :title, expense_date = :date, id_category = :category
+        WHERE id_expense = :id AND id_user = :uid
+    ");
+    $stmt->execute([
+        ':amount'   => $amount,
+        ':title'    => $title,
+        ':date'     => $date,
+        ':category' => $categoryId,
+        ':id'       => $expenseId,
+        ':uid'      => $userId,
+    ]);
+    return $stmt->rowCount() > 0;
 }
 
 /**
