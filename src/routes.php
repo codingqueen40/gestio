@@ -12,7 +12,7 @@ return [
     'GET /signup'              => 'signup.php',
     'POST /signup'             => 'signup.php',
 
-    'GET /logout'              => 'logout.php',
+    'POST /logout'             => 'logout.php',
 
     'GET /about'               => 'about.php',
 
