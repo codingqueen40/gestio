@@ -4,7 +4,7 @@
  * Un contrôleur qui gère GET et POST est listé pour les deux méthodes.
  */
 return [
-    'GET /'                    => 'dashboard.php',
+    'GET /'                    => 'home.php',
 
     'GET /login'               => 'login.php',
     'POST /login'              => 'login.php',
