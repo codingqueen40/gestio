@@ -35,4 +35,16 @@ $hasFilter     = $filterMonth !== '' || $filterCategory !== '';
 // Répartition par catégorie pour le graphique (suit la liste filtrée affichée).
 $byCategory    = sumByCategory($filtered);
 
+// --- Budgets du mois courant (indépendants des filtres d'affichage) ---
+$categoryBudgets = getCategoryBudgets($pdo, currentUserId());
+$globalBudget    = getGlobalBudget($pdo, currentUserId());
+$currentExpenses = filterExpenses($expenses, $currentMonth, null);
+$budgetRows      = budgetProgress($categories, $categoryBudgets, $currentExpenses);
+// Le « dépensé » global du mois = $monthlyTotal (déjà calculé plus haut).
+$globalPct       = ($globalBudget !== null && $globalBudget > 0)
+    ? ($monthlyTotal / $globalBudget) * 100
+    : 0.0;
+$globalOver      = $globalBudget !== null && $monthlyTotal > $globalBudget;
+$hasBudgets      = $globalBudget !== null || count($budgetRows) > 0;
+
 require __DIR__ . '/../views/dashboard.php';

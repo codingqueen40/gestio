@@ -14,6 +14,12 @@ return [
 
     'POST /logout'             => 'logout.php',
 
+    'GET /profil'              => 'profile.php',
+    'POST /profil'             => 'profile.php',
+
+    'GET /budgets'             => 'budgets.php',
+    'POST /budgets'            => 'budgets.php',
+
     'GET /about'               => 'about.php',
 
     'GET /contact'             => 'contact.php',
