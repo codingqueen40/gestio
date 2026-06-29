@@ -35,8 +35,6 @@ return [
 
     'GET /about'               => 'about.php',
 
-    'GET /contact'             => 'contact.php',
-
     'GET /recurrences'              => 'recurrences.php',
     'GET /recurrences/ajouter'      => 'recurrence_add.php',
     'POST /recurrences/ajouter'     => 'recurrence_add.php',
