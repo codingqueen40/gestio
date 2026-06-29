@@ -4,18 +4,6 @@
  * Toutes les opérations sont systématiquement filtrées par utilisateur.
  */
 
-/** Retourne toutes les catégories, triées par nom. */
-function getCategories(PDO $pdo): array
-{
-    return $pdo->query("SELECT * FROM category ORDER BY name")->fetchAll();
-}
-
-/** Retourne la liste des id_category existants (pour valider un formulaire). */
-function getCategoryIds(PDO $pdo): array
-{
-    return $pdo->query("SELECT id_category FROM category")->fetchAll(PDO::FETCH_COLUMN);
-}
-
 /** Retourne les dépenses d'un utilisateur (avec nom/couleur de catégorie). */
 function getExpensesByUser(PDO $pdo, int $userId): array
 {

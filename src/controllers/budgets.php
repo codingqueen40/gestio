@@ -6,7 +6,7 @@
 requireLogin();
 
 $userId     = currentUserId();
-$categories = getCategories($pdo);
+$categories = getCategories($pdo, $userId);
 
 $errors = [];
 // Valeurs du formulaire : on part de l'existant, écrasé par le POST en cas de ré-affichage.

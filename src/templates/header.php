@@ -7,9 +7,10 @@ $mainMenu = [
     '/contact' => 'Contact',
 ];
 
-// Entrée réservée aux utilisateurs connectés (page protégée).
+// Entrées réservées aux utilisateurs connectés (pages protégées).
 if (isLoggedIn()) {
-    $mainMenu['/budgets'] = 'Budgets';
+    $mainMenu['/budgets']    = 'Budgets';
+    $mainMenu['/categories'] = 'Catégories';
 }
 
 // Chemin courant fourni par le front controller (fallback sur '/').
