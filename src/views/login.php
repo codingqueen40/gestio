@@ -6,6 +6,12 @@
 </div>
 <?php endif; ?>
 
+<?php if (isset($_GET['account_deleted'])): ?>
+<div class="alert alert-info">
+    Ton compte a bien été supprimé.
+</div>
+<?php endif; ?>
+
 <?php foreach ($errors as $error): ?>
 <div class="alert alert-danger">
     <?= htmlspecialchars($error) ?>

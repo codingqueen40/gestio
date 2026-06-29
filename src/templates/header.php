@@ -56,7 +56,7 @@ $currentPage = $currentPath ?? '/';
             </ul>
             <div class="col-md-3 text-end">
                 <?php if (isLoggedIn()): ?>
-                <span class="me-2">Bonjour <?= htmlspecialchars(currentUsername()) ?></span>
+                <a href="/profil" class="me-2 link-secondary text-decoration-none">Bonjour <?= htmlspecialchars(currentUsername()) ?></a>
                 <form action="/logout" method="post" class="d-inline">
                     <?= csrfField() ?>
                     <button type="submit" class="btn btn-outline-danger">Logout</button>

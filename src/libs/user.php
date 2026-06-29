@@ -37,6 +37,66 @@ function emailExists(PDO $pdo, string $email):bool
     return (bool) $query->fetchColumn();
 }
 
+/** Récupère un utilisateur complet par son id (ou null s'il n'existe pas). */
+function getUserById(PDO $pdo, int $id):?array
+{
+    $query = $pdo->prepare("SELECT id_user, username, email, password FROM user WHERE id_user = :id");
+    $query->bindValue(":id", $id, $pdo::PARAM_INT);
+    $query->execute();
+
+    $user = $query->fetch(PDO::FETCH_ASSOC);
+    return $user ?: null;
+}
+
+/** Met à jour le nom d'utilisateur d'un compte. */
+function updateUsername(PDO $pdo, int $id, string $username):bool
+{
+    $query = $pdo->prepare("UPDATE user SET username = :username WHERE id_user = :id");
+    $query->bindValue(":username", $username, $pdo::PARAM_STR);
+    $query->bindValue(":id", $id, $pdo::PARAM_INT);
+
+    return $query->execute();
+}
+
+/**
+ * Met à jour l'email d'un compte.
+ * Renvoie false si l'email est déjà pris (violation de la contrainte UNIQUE).
+ */
+function updateUserEmail(PDO $pdo, int $id, string $email):bool
+{
+    $query = $pdo->prepare("UPDATE user SET email = :email WHERE id_user = :id");
+    $query->bindValue(":email", $email, $pdo::PARAM_STR);
+    $query->bindValue(":id", $id, $pdo::PARAM_INT);
+
+    try {
+        return $query->execute();
+    } catch (PDOException $e) {
+        if ($e->getCode() === '23000') { // email déjà utilisé
+            return false;
+        }
+        throw $e;
+    }
+}
+
+/** Met à jour (et re-hash) le mot de passe d'un compte. */
+function updateUserPassword(PDO $pdo, int $id, string $password):bool
+{
+    $query = $pdo->prepare("UPDATE user SET password = :password WHERE id_user = :id");
+    $query->bindValue(":password", password_hash($password, PASSWORD_DEFAULT), $pdo::PARAM_STR);
+    $query->bindValue(":id", $id, $pdo::PARAM_INT);
+
+    return $query->execute();
+}
+
+/** Supprime un compte. Les dépenses liées partent en cascade (FK id_user ON DELETE CASCADE). */
+function deleteUser(PDO $pdo, int $id):bool
+{
+    $query = $pdo->prepare("DELETE FROM user WHERE id_user = :id");
+    $query->bindValue(":id", $id, $pdo::PARAM_INT);
+
+    return $query->execute();
+}
+
 function verifyUserLogin(PDO $pdo, string $email, string $password):bool|array
 {
     $query = $pdo->prepare("SELECT id_user, username, email, password FROM user WHERE email = :email");
