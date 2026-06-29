@@ -12,6 +12,9 @@ require_once __DIR__ . '/../src/libs/expense.php';
 require_once __DIR__ . '/../src/libs/budget.php';
 require_once __DIR__ . '/../src/libs/recurring.php';
 
+// Auto-login via cookie "Se souvenir de moi" si aucune session active.
+checkRememberToken($pdo);
+
 $routes = require __DIR__ . '/../src/routes.php';
 
 // Méthode + chemin demandés (sans query string, sans slash final superflu).
