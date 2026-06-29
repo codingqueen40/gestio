@@ -3,6 +3,7 @@
 requireLogin();
 csrfCheck();
 
+clearRememberToken($pdo);
 logoutUser();
 
 header('Location: /login');

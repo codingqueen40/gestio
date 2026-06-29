@@ -97,6 +97,15 @@ function deleteUser(PDO $pdo, int $id):bool
     return $query->execute();
 }
 
+/** Récupère un utilisateur par son email (ou null). */
+function getUserByEmail(PDO $pdo, string $email): ?array
+{
+    $stmt = $pdo->prepare("SELECT id_user, username, email FROM `user` WHERE email = :email LIMIT 1");
+    $stmt->execute([':email' => $email]);
+    $row = $stmt->fetch();
+    return $row === false ? null : $row;
+}
+
 function verifyUserLogin(PDO $pdo, string $email, string $password):bool|array
 {
     $query = $pdo->prepare("SELECT id_user, username, email, password FROM user WHERE email = :email");

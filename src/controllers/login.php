@@ -17,6 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = verifyUserLogin($pdo, $old['email'], $password);
         if ($user) {
             loginUser($user);
+            if (!empty($_POST['remember'])) {
+                setRememberToken($pdo, (int) $user['id_user']);
+            }
             header('Location: /');
             exit;
         }

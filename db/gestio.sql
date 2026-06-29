@@ -163,6 +163,40 @@ ALTER TABLE `category`
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `remember_token` (sessions persistantes "Se souvenir de moi")
+--
+
+CREATE TABLE `remember_token` (
+  `id_token` int NOT NULL AUTO_INCREMENT,
+  `id_user` int NOT NULL,
+  `token_hash` char(64) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  PRIMARY KEY (`id_token`),
+  UNIQUE KEY `uq_token_hash` (`token_hash`),
+  KEY `id_user` (`id_user`),
+  CONSTRAINT `remember_token_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `password_reset` (tokens de réinitialisation de mot de passe, valides 1h)
+--
+
+CREATE TABLE `password_reset` (
+  `id_reset` int NOT NULL AUTO_INCREMENT,
+  `id_user` int NOT NULL,
+  `token_hash` char(64) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  PRIMARY KEY (`id_reset`),
+  UNIQUE KEY `uq_reset_token_hash` (`token_hash`),
+  KEY `id_user` (`id_user`),
+  CONSTRAINT `password_reset_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `recurring_expense` (dépenses mensuelles automatiques)
 --
 

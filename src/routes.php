@@ -27,6 +27,12 @@ return [
     'POST /categories/modifier'  => 'category_edit.php',
     'POST /categories/supprimer' => 'category_delete.php',
 
+    'GET /mot-de-passe-oublie'  => 'forgot_password.php',
+    'POST /mot-de-passe-oublie' => 'forgot_password.php',
+
+    'GET /reinitialiser-mdp'    => 'reset_password.php',
+    'POST /reinitialiser-mdp'   => 'reset_password.php',
+
     'GET /about'               => 'about.php',
 
     'GET /contact'             => 'contact.php',
