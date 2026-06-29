@@ -30,21 +30,24 @@ SET time_zone = "+00:00";
 CREATE TABLE `category` (
   `id_category` int NOT NULL,
   `name` varchar(50) NOT NULL,
-  `color` varchar(7) NOT NULL
+  `color` varchar(7) NOT NULL,
+  `id_user` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `category`
+-- (catégories par défaut du compte de démonstration Eva ; chaque nouveau
+--  compte reçoit sa propre copie via seedDefaultCategories() à l'inscription)
 --
 
-INSERT INTO `category` (`id_category`, `name`, `color`) VALUES
-(1, 'Food', '#28a745'),
-(2, 'Travel', '#007bff'),
-(3, 'Housing', '#dc3545'),
-(4, 'Hobbies', '#ffc107'),
-(5, 'Health', '#17a2b8'),
-(6, 'Education', '#6610f2'),
-(7, 'Other', '#6c757d');
+INSERT INTO `category` (`id_category`, `name`, `color`, `id_user`) VALUES
+(1, 'Food', '#28a745', 1),
+(2, 'Travel', '#007bff', 1),
+(3, 'Housing', '#dc3545', 1),
+(4, 'Hobbies', '#ffc107', 1),
+(5, 'Health', '#17a2b8', 1),
+(6, 'Education', '#6610f2', 1),
+(7, 'Other', '#6c757d', 1);
 
 -- --------------------------------------------------------
 
@@ -58,7 +61,8 @@ CREATE TABLE `expense` (
   `title` varchar(255) NOT NULL,
   `expense_date` date NOT NULL,
   `id_category` int NOT NULL,
-  `id_user` int NOT NULL
+  `id_user` int NOT NULL,
+  `note` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -78,7 +82,8 @@ CREATE TABLE `user` (
   `id_user` int NOT NULL,
   `username` varchar(50) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `monthly_budget` decimal(15,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -98,7 +103,8 @@ INSERT INTO `user` (`id_user`, `username`, `email`, `password`) VALUES
 -- Index pour la table `category`
 --
 ALTER TABLE `category`
-  ADD PRIMARY KEY (`id_category`);
+  ADD PRIMARY KEY (`id_category`),
+  ADD KEY `id_user` (`id_user`);
 
 --
 -- Index pour la table `expense`
@@ -147,6 +153,116 @@ ALTER TABLE `user`
 ALTER TABLE `expense`
   ADD CONSTRAINT `expense_ibfk_1` FOREIGN KEY (`id_category`) REFERENCES `category` (`id_category`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `expense_ibfk_2` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `category`
+--
+ALTER TABLE `category`
+  ADD CONSTRAINT `category_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `remember_token` (sessions persistantes "Se souvenir de moi")
+--
+
+CREATE TABLE `remember_token` (
+  `id_token` int NOT NULL AUTO_INCREMENT,
+  `id_user` int NOT NULL,
+  `token_hash` char(64) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  PRIMARY KEY (`id_token`),
+  UNIQUE KEY `uq_token_hash` (`token_hash`),
+  KEY `id_user` (`id_user`),
+  CONSTRAINT `remember_token_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `password_reset` (tokens de réinitialisation de mot de passe, valides 1h)
+--
+
+CREATE TABLE `password_reset` (
+  `id_reset` int NOT NULL AUTO_INCREMENT,
+  `id_user` int NOT NULL,
+  `token_hash` char(64) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  PRIMARY KEY (`id_reset`),
+  UNIQUE KEY `uq_reset_token_hash` (`token_hash`),
+  KEY `id_user` (`id_user`),
+  CONSTRAINT `password_reset_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `recurring_expense` (dépenses mensuelles automatiques)
+--
+
+CREATE TABLE `recurring_expense` (
+  `id_recurring` int NOT NULL AUTO_INCREMENT,
+  `id_user` int NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `amount` decimal(15,2) NOT NULL,
+  `id_category` int NOT NULL,
+  `day_of_month` tinyint NOT NULL DEFAULT '1',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_recurring`),
+  KEY `id_user` (`id_user`),
+  KEY `id_category` (`id_category`),
+  CONSTRAINT `recurring_expense_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `recurring_expense_ibfk_2` FOREIGN KEY (`id_category`) REFERENCES `category` (`id_category`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `recurring_expense_log` (trace des mois déjà générés)
+--
+
+CREATE TABLE `recurring_expense_log` (
+  `id_log` int NOT NULL AUTO_INCREMENT,
+  `id_recurring` int NOT NULL,
+  `year_month` char(7) NOT NULL,
+  PRIMARY KEY (`id_log`),
+  UNIQUE KEY `uq_log_recurring_month` (`id_recurring`,`year_month`),
+  CONSTRAINT `recurring_expense_log_ibfk_1` FOREIGN KEY (`id_recurring`) REFERENCES `recurring_expense` (`id_recurring`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `budget` (plafond mensuel récurrent par catégorie et par utilisateur)
+--
+
+CREATE TABLE `budget` (
+  `id_budget` int NOT NULL,
+  `id_user` int NOT NULL,
+  `id_category` int NOT NULL,
+  `amount` decimal(15,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Index pour la table `budget`
+--
+ALTER TABLE `budget`
+  ADD PRIMARY KEY (`id_budget`),
+  ADD UNIQUE KEY `uq_budget_user_cat` (`id_user`,`id_category`),
+  ADD KEY `id_category` (`id_category`);
+
+--
+-- AUTO_INCREMENT pour la table `budget`
+--
+ALTER TABLE `budget`
+  MODIFY `id_budget` int NOT NULL AUTO_INCREMENT;
+
+--
+-- Contraintes pour la table `budget`
+--
+ALTER TABLE `budget`
+  ADD CONSTRAINT `budget_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `budget_ibfk_2` FOREIGN KEY (`id_category`) REFERENCES `category` (`id_category`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

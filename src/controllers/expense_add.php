@@ -8,6 +8,7 @@ $old = [
     'amount'   => '',
     'date'     => date('Y-m-d'),
     'category' => '',
+    'note'     => '',
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -17,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $old['amount']   = trim($_POST['amount'] ?? '');
     $old['date']     = trim($_POST['date'] ?? '');
     $old['category'] = trim($_POST['category'] ?? '');
+    $old['note']     = trim($_POST['note'] ?? '');
 
     // Validation
     if ($old['title'] === '') {
@@ -34,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "La date n'est pas valide";
     }
 
-    if (!in_array((int) $old['category'], array_map('intval', getCategoryIds($pdo)), true)) {
+    if (!in_array((int) $old['category'], array_map('intval', getCategoryIds($pdo, currentUserId())), true)) {
         $errors[] = "La catégorie sélectionnée n'existe pas";
     }
 
@@ -45,7 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $old['title'],
             (float) $old['amount'],
             $old['date'],
-            (int) $old['category']
+            (int) $old['category'],
+            $old['note']
         );
 
         if ($ok) {
@@ -56,6 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$categories = getCategories($pdo);
+$categories = getCategories($pdo, currentUserId());
 
 require __DIR__ . '/../views/expense_add.php';

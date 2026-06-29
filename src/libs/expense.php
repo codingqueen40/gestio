@@ -4,18 +4,6 @@
  * Toutes les opérations sont systématiquement filtrées par utilisateur.
  */
 
-/** Retourne toutes les catégories, triées par nom. */
-function getCategories(PDO $pdo): array
-{
-    return $pdo->query("SELECT * FROM category ORDER BY name")->fetchAll();
-}
-
-/** Retourne la liste des id_category existants (pour valider un formulaire). */
-function getCategoryIds(PDO $pdo): array
-{
-    return $pdo->query("SELECT id_category FROM category")->fetchAll(PDO::FETCH_COLUMN);
-}
-
 /** Retourne les dépenses d'un utilisateur (avec nom/couleur de catégorie). */
 function getExpensesByUser(PDO $pdo, int $userId): array
 {
@@ -43,11 +31,11 @@ function getExpenseById(PDO $pdo, int $userId, int $expenseId): ?array
 }
 
 /** Ajoute une dépense pour un utilisateur. */
-function addExpense(PDO $pdo, int $userId, string $title, float $amount, string $date, int $categoryId): bool
+function addExpense(PDO $pdo, int $userId, string $title, float $amount, string $date, int $categoryId, string $note = ''): bool
 {
     $stmt = $pdo->prepare("
-        INSERT INTO expense (amount, title, expense_date, id_category, id_user)
-        VALUES (:amount, :title, :date, :category, :uid)
+        INSERT INTO expense (amount, title, expense_date, id_category, id_user, note)
+        VALUES (:amount, :title, :date, :category, :uid, :note)
     ");
     return $stmt->execute([
         ':amount'   => $amount,
@@ -55,6 +43,7 @@ function addExpense(PDO $pdo, int $userId, string $title, float $amount, string 
         ':date'     => $date,
         ':category' => $categoryId,
         ':uid'      => $userId,
+        ':note'     => $note !== '' ? $note : null,
     ]);
 }
 
@@ -63,11 +52,11 @@ function addExpense(PDO $pdo, int $userId, string $title, float $amount, string 
  * Le filtre id_user empêche de modifier la dépense d'un autre compte.
  * Retourne true si une ligne a réellement été modifiée.
  */
-function updateExpense(PDO $pdo, int $userId, int $expenseId, string $title, float $amount, string $date, int $categoryId): bool
+function updateExpense(PDO $pdo, int $userId, int $expenseId, string $title, float $amount, string $date, int $categoryId, string $note = ''): bool
 {
     $stmt = $pdo->prepare("
         UPDATE expense
-        SET amount = :amount, title = :title, expense_date = :date, id_category = :category
+        SET amount = :amount, title = :title, expense_date = :date, id_category = :category, note = :note
         WHERE id_expense = :id AND id_user = :uid
     ");
     $stmt->execute([
@@ -75,6 +64,7 @@ function updateExpense(PDO $pdo, int $userId, int $expenseId, string $title, flo
         ':title'    => $title,
         ':date'     => $date,
         ':category' => $categoryId,
+        ':note'     => $note !== '' ? $note : null,
         ':id'       => $expenseId,
         ':uid'      => $userId,
     ]);
@@ -112,13 +102,16 @@ function getExpenseMonths(array $expenses): array
  * Filtre une liste de dépenses par mois ('Y-m') et/ou catégorie (id_category).
  * Un argument à null = pas de filtre sur ce critère.
  */
-function filterExpenses(array $expenses, ?string $month = null, ?int $categoryId = null): array
+function filterExpenses(array $expenses, ?string $month = null, ?int $categoryId = null, ?string $search = null): array
 {
-    return array_values(array_filter($expenses, static function ($d) use ($month, $categoryId) {
+    return array_values(array_filter($expenses, static function ($d) use ($month, $categoryId, $search) {
         if ($month !== null && substr($d['expense_date'], 0, 7) !== $month) {
             return false;
         }
         if ($categoryId !== null && (int) $d['id_category'] !== $categoryId) {
+            return false;
+        }
+        if ($search !== null && stripos($d['title'], $search) === false) {
             return false;
         }
         return true;
@@ -146,6 +139,30 @@ function sumByCategory(array $expenses): array
     }
     usort($byCat, static fn ($a, $b) => $b['total'] <=> $a['total']);
     return $byCat;
+}
+
+/**
+ * Totaux mensuels pour un line chart d'évolution.
+ * Retourne [['month'=>'Y-m','label'=>'MM/YYYY','total'=>float], ...] trié chronologiquement.
+ * Opère sur toutes les dépenses (pas de filtre) pour montrer la tendance complète.
+ */
+function sumByMonth(array $expenses): array
+{
+    $months = [];
+    foreach ($expenses as $d) {
+        $ym = substr($d['expense_date'], 0, 7);
+        $months[$ym] = ($months[$ym] ?? 0.0) + (float) $d['amount'];
+    }
+    ksort($months);
+    $result = [];
+    foreach ($months as $ym => $total) {
+        $result[] = [
+            'month' => $ym,
+            'label' => substr($ym, 5, 2) . '/' . substr($ym, 0, 4),
+            'total' => round($total, 2),
+        ];
+    }
+    return $result;
 }
 
 /** Somme totale d'une liste de dépenses. */

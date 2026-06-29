@@ -1,11 +1,20 @@
 <?php
 require_once __DIR__ . '/../libs/auth.php';
 
+$theme = in_array($_COOKIE['theme'] ?? '', ['light', 'dark']) ? $_COOKIE['theme'] : 'light';
+
 $mainMenu = [
     '/'        => 'Home',
     '/about'   => 'About',
     '/contact' => 'Contact',
 ];
+
+// Entrées réservées aux utilisateurs connectés (pages protégées).
+if (isLoggedIn()) {
+    $mainMenu['/budgets']      = 'Budgets';
+    $mainMenu['/categories']   = 'Catégories';
+    $mainMenu['/recurrences']  = 'Récurrences';
+}
 
 // Chemin courant fourni par le front controller (fallback sur '/').
 $currentPage = $currentPath ?? '/';
@@ -14,7 +23,7 @@ $currentPage = $currentPath ?? '/';
 ?>
 
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bs-theme="<?= $theme ?>"><?php // valeur sanitisée : 'light' | 'dark' ?>
 
 <head>
     <meta charset="UTF-8">
@@ -55,8 +64,13 @@ $currentPage = $currentPath ?? '/';
 
             </ul>
             <div class="col-md-3 text-end">
+                <button id="theme-toggle" type="button"
+                    class="btn btn-outline-secondary btn-sm me-2"
+                    aria-label="<?= $theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre' ?>">
+                    <i class="bi <?= $theme === 'dark' ? 'bi-sun-fill' : 'bi-moon-fill' ?>"></i>
+                </button>
                 <?php if (isLoggedIn()): ?>
-                <span class="me-2">Bonjour <?= htmlspecialchars(currentUsername()) ?></span>
+                <a href="/profil" class="me-2 link-secondary text-decoration-none">Bonjour <?= htmlspecialchars(currentUsername()) ?></a>
                 <form action="/logout" method="post" class="d-inline">
                     <?= csrfField() ?>
                     <button type="submit" class="btn btn-outline-danger">Logout</button>

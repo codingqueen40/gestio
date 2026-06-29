@@ -2,26 +2,47 @@
 # Run it with: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 # It overrides some base settings to harden the deployment.
 services:
-  php:
-    restart: always # stricter than unless-stopped: also restarts after host reboot
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
     environment:
-      APP_ENV: production # PHP knows it runs in prod (useful in your code)
-    # NO "ports:" → PHP is NOT exposed directly
-    # In prod, a reverse proxy (Caddy/Traefik) handles port 443 + HTTPS and forwards to the container
+      DOMAIN: ${DOMAIN}
+    depends_on:
+      - php
+
+  php:
+    restart: always
+    environment:
+      APP_ENV: production
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+    # NO "ports:" → PHP is NOT exposed directly; Caddy reverse-proxies to it
     security_opt:
-      - no-new-privileges:true # blocks privilege escalation inside the container
-    read_only: false # set to true if your app does not write to disk (max hardening)
+      - no-new-privileges:true
+    read_only: false
 
   mysql:
     restart: always
     # NO "ports:" → MySQL is NEVER reachable from the outside in prod
-    # Only the PHP container can reach it via the internal Docker network
     command:
-      - --default-authentication-plugin=caching_sha2_password # modern password hashing
-      - --bind-address=0.0.0.0 # listens only on the Docker network
+      - --default-authentication-plugin=caching_sha2_password
+      - --bind-address=0.0.0.0
     security_opt:
       - no-new-privileges:true
 
   # WARNING: no phpmyadmin section here!
-  # In prod you NEVER expose phpMyAdmin on the Internet.
-  # To admin the database in prod: SSH + tunnel, or a bastion host.
+  # To admin the database in prod: SSH tunnel + local phpMyAdmin, or Adminer.
+
+volumes:
+  caddy_data:
+  caddy_config:

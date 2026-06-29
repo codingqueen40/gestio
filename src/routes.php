@@ -14,9 +14,39 @@ return [
 
     'POST /logout'             => 'logout.php',
 
+    'GET /profil'              => 'profile.php',
+    'POST /profil'             => 'profile.php',
+
+    'GET /budgets'             => 'budgets.php',
+    'POST /budgets'            => 'budgets.php',
+
+    'GET /categories'            => 'categories.php',
+    'GET /categories/ajouter'    => 'category_add.php',
+    'POST /categories/ajouter'   => 'category_add.php',
+    'GET /categories/modifier'   => 'category_edit.php',
+    'POST /categories/modifier'  => 'category_edit.php',
+    'POST /categories/supprimer' => 'category_delete.php',
+
+    'GET /mot-de-passe-oublie'  => 'forgot_password.php',
+    'POST /mot-de-passe-oublie' => 'forgot_password.php',
+
+    'GET /reinitialiser-mdp'    => 'reset_password.php',
+    'POST /reinitialiser-mdp'   => 'reset_password.php',
+
     'GET /about'               => 'about.php',
 
     'GET /contact'             => 'contact.php',
+
+    'GET /recurrences'              => 'recurrences.php',
+    'GET /recurrences/ajouter'      => 'recurrence_add.php',
+    'POST /recurrences/ajouter'     => 'recurrence_add.php',
+    'GET /recurrences/modifier'     => 'recurrence_edit.php',
+    'POST /recurrences/modifier'    => 'recurrence_edit.php',
+    'POST /recurrences/supprimer'   => 'recurrence_delete.php',
+
+    'GET /depenses/exporter'   => 'expense_export.php',
+    'GET /depenses/importer'   => 'expense_import.php',
+    'POST /depenses/importer'  => 'expense_import.php',
 
     'GET /depenses/ajouter'    => 'expense_add.php',
     'POST /depenses/ajouter'   => 'expense_add.php',

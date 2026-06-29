@@ -8,6 +8,12 @@
 
 <div class="container">
 
+    <?php if ($generatedCount > 0): ?>
+    <div class="alert alert-info">
+        <?= $generatedCount ?> dépense<?= $generatedCount > 1 ? 's récurrentes ont été générées' : ' récurrente a été générée' ?> automatiquement ce mois-ci.
+    </div>
+    <?php endif; ?>
+
     <?php if (isset($_GET['added'])): ?>
     <div class="alert alert-success">Dépense ajoutée avec succès.</div>
     <?php endif; ?>
@@ -43,6 +49,75 @@
         </div>
     </div>
 
+    <?php
+    // Couleur de barre selon l'état : dépassé (rouge), proche (jaune ≥ 80%), sinon vert.
+    $barClass = static function (float $pct, bool $over): string {
+        if ($over) {
+            return 'bg-danger';
+        }
+        return $pct >= 80 ? 'bg-warning' : 'bg-success';
+    };
+    ?>
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Budgets du mois (<?= date('m/Y') ?>)</strong>
+            <a href="/budgets" class="btn btn-sm btn-outline-primary">Gérer les budgets</a>
+        </div>
+        <div class="card-body">
+            <?php if (!$hasBudgets): ?>
+            <p class="text-muted mb-0">
+                Aucun budget défini. <a href="/budgets">Fixe tes plafonds mensuels</a> pour suivre ta progression.
+            </p>
+            <?php else: ?>
+
+            <?php if ($globalBudget !== null): ?>
+            <div class="mb-4">
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="fw-bold">Budget global</span>
+                    <span class="<?= $globalOver ? 'text-danger fw-bold' : '' ?>">
+                        <?= number_format($monthlyTotal, 2, ',', ' ') ?> /
+                        <?= number_format($globalBudget, 2, ',', ' ') ?> EUR
+                        <?php if ($globalOver): ?>⚠️ dépassé<?php endif; ?>
+                    </span>
+                </div>
+                <div class="progress" role="progressbar"
+                    aria-valuenow="<?= (int) round($globalPct) ?>" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar <?= $barClass($globalPct, $globalOver) ?>"
+                        style="width: <?= min(100, round($globalPct, 1)) ?>%">
+                        <?= (int) round($globalPct) ?>%
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php foreach ($budgetRows as $b): ?>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>
+                        <span class="badge" style="background-color: <?= htmlspecialchars($b['color']) ?>">
+                            <?= htmlspecialchars($b['name']) ?>
+                        </span>
+                    </span>
+                    <span class="<?= $b['over'] ? 'text-danger fw-bold' : '' ?>">
+                        <?= number_format($b['spent'], 2, ',', ' ') ?> /
+                        <?= number_format($b['budget'], 2, ',', ' ') ?> EUR
+                        <?php if ($b['over']): ?>⚠️<?php endif; ?>
+                    </span>
+                </div>
+                <div class="progress" role="progressbar"
+                    aria-valuenow="<?= (int) round($b['pct']) ?>" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar <?= $barClass($b['pct'], $b['over']) ?>"
+                        style="width: <?= min(100, round($b['pct'], 1)) ?>%">
+                        <?= (int) round($b['pct']) ?>%
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+
+            <?php endif; ?>
+        </div>
+    </div>
+
     <div class="card mb-4">
         <div class="card-header">
             <strong>Répartition par catégorie</strong>
@@ -62,11 +137,25 @@
     </div>
 
     <div class="card mb-4">
+        <div class="card-header"><strong>Évolution mensuelle</strong></div>
+        <div class="card-body">
+            <?php if (count($byMonth) === 0): ?>
+            <p class="text-muted mb-0">Aucune donnée à afficher.</p>
+            <?php else: ?>
+            <canvas id="monthlyChart" height="120"></canvas>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="card mb-4">
         <div class="card-header">
-            <div
-                class="d-flex justify-content-between align-items-center mb-2">
-                <strong>Dernieres depenses</strong>
-                <a href="/depenses/ajouter" class="btn btn-sm btn-primary">+ Ajouter</a>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Dernières dépenses</strong>
+                <div class="d-flex gap-2">
+                    <a href="/depenses/exporter" class="btn btn-sm btn-outline-secondary">Exporter CSV</a>
+                    <a href="/depenses/importer" class="btn btn-sm btn-outline-secondary">Importer CSV</a>
+                    <a href="/depenses/ajouter" class="btn btn-sm btn-primary">+ Ajouter</a>
+                </div>
             </div>
             <form method="get" action="/" class="row g-2 align-items-end">
                 <div class="col-auto">
@@ -95,6 +184,13 @@
                         </option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+                <div class="col-auto">
+                    <label for="search" class="form-label small mb-1">Recherche</label>
+                    <input type="text" id="search" name="search"
+                        class="form-control form-control-sm"
+                        placeholder="Libellé…"
+                        value="<?= htmlspecialchars($filterSearch) ?>">
                 </div>
                 <div class="col-auto">
                     <button type="submit"
@@ -143,7 +239,12 @@
                     <tr>
                         <td><?= date('d/m/Y', strtotime($d['expense_date'])) ?>
                         </td>
-                        <td><?= htmlspecialchars($d['title']) ?></td>
+                        <td>
+                            <?= htmlspecialchars($d['title']) ?>
+                            <?php if (!empty($d['note'])): ?>
+                            <br><small class="text-muted"><?= htmlspecialchars($d['note']) ?></small>
+                            <?php endif; ?>
+                        </td>
                         <td>
                             <?php if ($d['category_name']): ?>
                             <span class="badge"
@@ -190,40 +291,83 @@
 
 </div>
 
-<?php if (count($byCategory) > 0): ?>
+<?php if (count($byCategory) > 0 || count($byMonth) > 0): ?>
 <?php
-// Encodage sûr pour injection dans <script> (évite toute cassure </script>).
-$jsonFlags  = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
-$chartData  = [
+$jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+$catChartData = [
     'labels' => array_column($byCategory, 'name'),
     'data'   => array_map(static fn ($c) => round($c['total'], 2), $byCategory),
     'colors' => array_column($byCategory, 'color'),
 ];
+$monthChartData = [
+    'labels' => array_column($byMonth, 'label'),
+    'data'   => array_column($byMonth, 'total'),
+];
 ?>
-<script
-    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
-    (function () {
-        const chart = <?= json_encode($chartData, $jsonFlags) ?>;
-        new Chart(document.getElementById('categoryChart'), {
-            type: 'doughnut',
-            data: {
-                labels: chart.labels,
-                datasets: [{ data: chart.data, backgroundColor: chart.colors }]
-            },
-            options: {
-                plugins: {
-                    legend: { position: 'bottom' },
-                    tooltip: {
-                        callbacks: {
-                            label: (c) => `${c.label}: ` +
-                                c.parsed.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
-                        }
+(function () {
+    <?php if (count($byCategory) > 0): ?>
+    const catChart = <?= json_encode($catChartData, $jsonFlags) ?>;
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: catChart.labels,
+            datasets: [{ data: catChart.data, backgroundColor: catChart.colors }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: (c) => `${c.label}: ` +
+                            c.parsed.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
                     }
                 }
             }
-        });
-    })();
+        }
+    });
+    <?php endif; ?>
+
+    <?php if (count($byMonth) > 0): ?>
+    const monthChart = <?= json_encode($monthChartData, $jsonFlags) ?>;
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'line',
+        data: {
+            labels: monthChart.labels,
+            datasets: [{
+                label: 'Dépenses (EUR)',
+                data: monthChart.data,
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13,110,253,0.08)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (c) => c.parsed.y.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (v) => v.toLocaleString('fr-FR') + ' €'
+                    }
+                }
+            }
+        }
+    });
+    <?php endif; ?>
+})();
 </script>
 <?php endif; ?>
 

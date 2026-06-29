@@ -31,6 +31,21 @@
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
     crossorigin="anonymous"></script>
+<script>
+(function () {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        var html = document.documentElement;
+        var next = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-bs-theme', next);
+        var icon = btn.querySelector('i');
+        icon.className = next === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+        btn.setAttribute('aria-label', next === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre');
+        document.cookie = 'theme=' + next + '; path=/; max-age=' + (365 * 24 * 3600) + '; SameSite=Lax';
+    });
+})();
+</script>
 </body>
 
 </html>
