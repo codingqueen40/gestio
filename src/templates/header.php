@@ -64,7 +64,7 @@ $currentPage = $currentPath ?? '/';
                 <?php endforeach; ?>
 
             </ul>
-            <div class="col-md-3 text-end">
+            <div class="col-12 col-md-3 text-center text-md-end mt-1 mt-md-0">
                 <button id="theme-toggle" type="button"
                     class="btn btn-outline-secondary btn-sm me-2"
                     aria-label="<?= $theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre' ?>">
