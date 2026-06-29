@@ -35,6 +35,9 @@ $hasFilter     = $filterMonth !== '' || $filterCategory !== '';
 // Répartition par catégorie pour le graphique (suit la liste filtrée affichée).
 $byCategory    = sumByCategory($filtered);
 
+// Évolution mensuelle (toutes dépenses, indépendante des filtres d'affichage).
+$byMonth       = sumByMonth($expenses);
+
 // --- Budgets du mois courant (indépendants des filtres d'affichage) ---
 $categoryBudgets = getCategoryBudgets($pdo, currentUserId());
 $globalBudget    = getGlobalBudget($pdo, currentUserId());

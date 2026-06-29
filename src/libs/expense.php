@@ -136,6 +136,30 @@ function sumByCategory(array $expenses): array
     return $byCat;
 }
 
+/**
+ * Totaux mensuels pour un line chart d'évolution.
+ * Retourne [['month'=>'Y-m','label'=>'MM/YYYY','total'=>float], ...] trié chronologiquement.
+ * Opère sur toutes les dépenses (pas de filtre) pour montrer la tendance complète.
+ */
+function sumByMonth(array $expenses): array
+{
+    $months = [];
+    foreach ($expenses as $d) {
+        $ym = substr($d['expense_date'], 0, 7);
+        $months[$ym] = ($months[$ym] ?? 0.0) + (float) $d['amount'];
+    }
+    ksort($months);
+    $result = [];
+    foreach ($months as $ym => $total) {
+        $result[] = [
+            'month' => $ym,
+            'label' => substr($ym, 5, 2) . '/' . substr($ym, 0, 4),
+            'total' => round($total, 2),
+        ];
+    }
+    return $result;
+}
+
 /** Somme totale d'une liste de dépenses. */
 function sumExpenses(array $expenses): float
 {
