@@ -151,8 +151,8 @@
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                 <strong>Dernières dépenses</strong>
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="/depenses/exporter" class="btn btn-sm btn-outline-secondary">Exporter CSV</a>
-                    <a href="/depenses/importer" class="btn btn-sm btn-outline-secondary">Importer CSV</a>
+                    <a href="/depenses/exporter-pdf" class="btn btn-sm btn-outline-secondary">Exporter PDF</a>
+                    <a href="/depenses/importer-pdf" class="btn btn-sm btn-outline-secondary">Importer PDF</a>
                     <a href="/depenses/ajouter" class="btn btn-sm btn-primary">+ Ajouter</a>
                 </div>
             </div>
