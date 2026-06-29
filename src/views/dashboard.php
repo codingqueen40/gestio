@@ -180,6 +180,13 @@
                     </select>
                 </div>
                 <div class="col-auto">
+                    <label for="search" class="form-label small mb-1">Recherche</label>
+                    <input type="text" id="search" name="search"
+                        class="form-control form-control-sm"
+                        placeholder="Libellé…"
+                        value="<?= htmlspecialchars($filterSearch) ?>">
+                </div>
+                <div class="col-auto">
                     <button type="submit"
                         class="btn btn-sm btn-outline-primary">Filtrer</button>
                     <?php if ($hasFilter): ?>
@@ -226,7 +233,12 @@
                     <tr>
                         <td><?= date('d/m/Y', strtotime($d['expense_date'])) ?>
                         </td>
-                        <td><?= htmlspecialchars($d['title']) ?></td>
+                        <td>
+                            <?= htmlspecialchars($d['title']) ?>
+                            <?php if (!empty($d['note'])): ?>
+                            <br><small class="text-muted"><?= htmlspecialchars($d['note']) ?></small>
+                            <?php endif; ?>
+                        </td>
                         <td>
                             <?php if ($d['category_name']): ?>
                             <span class="badge"

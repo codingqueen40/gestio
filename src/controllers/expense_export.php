@@ -11,7 +11,7 @@ header('Cache-Control: no-cache, no-store');
 
 $out = fopen('php://output', 'w');
 fwrite($out, "\xEF\xBB\xBF"); // BOM UTF-8 (compatibilité Excel)
-fputcsv($out, ['Date', 'Libellé', 'Catégorie', 'Montant'], ',', '"', '\\');
+fputcsv($out, ['Date', 'Libellé', 'Catégorie', 'Montant', 'Note'], ',', '"', '\\');
 
 foreach ($expenses as $d) {
     fputcsv($out, [
@@ -19,6 +19,7 @@ foreach ($expenses as $d) {
         $d['title'],
         $d['category_name'] ?? '',
         number_format((float) $d['amount'], 2, '.', ''),
+        $d['note'] ?? '',
     ], ',', '"', '\\');
 }
 

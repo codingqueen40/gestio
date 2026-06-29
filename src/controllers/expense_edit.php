@@ -21,6 +21,7 @@ $old = [
     'amount'   => $expense['amount'],
     'date'     => $expense['expense_date'],
     'category' => (string) $expense['id_category'],
+    'note'     => $expense['note'] ?? '',
 ];
 
 if ($isPost) {
@@ -30,6 +31,7 @@ if ($isPost) {
     $old['amount']   = trim($_POST['amount'] ?? '');
     $old['date']     = trim($_POST['date'] ?? '');
     $old['category'] = trim($_POST['category'] ?? '');
+    $old['note']     = trim($_POST['note'] ?? '');
 
     // Validation (identique à l'ajout).
     if ($old['title'] === '') {
@@ -61,7 +63,8 @@ if ($isPost) {
             $old['title'],
             (float) $old['amount'],
             $old['date'],
-            (int) $old['category']
+            (int) $old['category'],
+            $old['note']
         );
 
         header("Location: /?updated=1");
