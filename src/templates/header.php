@@ -4,8 +4,8 @@ require_once __DIR__ . '/../libs/auth.php';
 $theme = in_array($_COOKIE['theme'] ?? '', ['light', 'dark']) ? $_COOKIE['theme'] : 'light';
 
 $mainMenu = [
-    '/'        => 'Home',
-    '/about'   => 'About',
+    '/'        => 'Accueil',
+    '/about'   => 'À propos',
     '/contact' => 'Contact',
 ];
 
@@ -23,12 +23,13 @@ $currentPage = $currentPath ?? '/';
 ?>
 
 <!DOCTYPE html>
-<html lang="fr" data-bs-theme="<?= $theme ?>"><?php // valeur sanitisée : 'light' | 'dark' ?>
+<html lang="fr" data-bs-theme="<?= $theme ?>">
+<?php // valeur sanitisée : 'light' | 'dark' ?>
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionnaire de dépenses</title>
+    <title>Gestio — Gestionnaire de dépenses</title>
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
         rel="stylesheet"
@@ -39,7 +40,7 @@ $currentPage = $currentPath ?? '/';
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 
-<body class="bg-light">
+<body>
 
     <div class="container">
         <header
@@ -67,29 +68,25 @@ $currentPage = $currentPath ?? '/';
                 <button id="theme-toggle" type="button"
                     class="btn btn-outline-secondary btn-sm me-2"
                     aria-label="<?= $theme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre' ?>">
-                    <i class="bi <?= $theme === 'dark' ? 'bi-sun-fill' : 'bi-moon-fill' ?>"></i>
+                    <i
+                        class="bi <?= $theme === 'dark' ? 'bi-sun-fill' : 'bi-moon-fill' ?>"></i>
                 </button>
                 <?php if (isLoggedIn()): ?>
-                <a href="/profil" class="me-2 link-secondary text-decoration-none">Bonjour <?= htmlspecialchars(currentUsername()) ?></a>
+                <a href="/profil"
+                    class="me-2 link-secondary text-decoration-none">Bonjour
+                    <?= htmlspecialchars(currentUsername()) ?></a>
                 <form action="/logout" method="post" class="d-inline">
                     <?= csrfField() ?>
-                    <button type="submit" class="btn btn-outline-danger">Logout</button>
+                    <button type="submit"
+                        class="btn btn-outline-danger">Déconnexion</button>
                 </form>
                 <?php else: ?>
-                <a href="/login" class="btn btn-outline-primary me-2">Login</a>
-                <a href="/signup" class="btn btn-primary">Sign-up</a>
+                <a href="/login" class="btn btn-outline-primary me-2">Connexion</a>
+                <a href="/signup" class="btn btn-primary">S'inscrire</a>
                 <?php endif; ?>
             </div>
         </header>
 
-
-        <nav class="navbar navbar-dark bg-dark mb-4">
-            <div class="container">
-                <span class="navbar-brand mb-0 h1">Gestionnaire de
-                    dépenses</span>
-                <span class="text-light small">Codingqueen40</span>
-            </div>
-        </nav>
     </div>
 
     <main class="container">

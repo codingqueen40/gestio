@@ -19,14 +19,14 @@
         <?= csrfField() ?>
 
         <div class="mb-4">
-            <label for="global" class="form-label fw-bold">Budget global mensuel (EUR)</label>
+            <label for="global" class="form-label fw-bold">Budget global mensuel (€)</label>
             <input type="number" step="0.01" min="0" class="form-control"
                 id="global" name="global" placeholder="Aucun plafond"
                 value="<?= htmlspecialchars($old['global']) ?>">
             <div class="form-text">Laisse vide pour ne pas fixer de plafond global.</div>
         </div>
 
-        <h2 class="h6 fw-bold">Par catégorie (EUR / mois)</h2>
+        <h2 class="h6 fw-bold">Par catégorie (€ / mois)</h2>
         <?php foreach ($categories as $cat): ?>
         <?php $id = (int) $cat['id_category']; ?>
         <div class="mb-3">

@@ -28,10 +28,9 @@
         <div class="col-md-6">
             <div class="card text-bg-primary h-100">
                 <div class="card-body">
-                    <h6 class="card-subtitle mb-2 opacity-75">Total general
-                    </h6>
+                    <h6 class="card-subtitle mb-2 opacity-75">Total général</h6>
                     <h3 class="card-title mb-0">
-                        <?= number_format($total, 2, ',', ' ') ?> EUR</h3>
+                        <?= number_format($total, 2, ',', ' ') ?> €</h3>
                     <small><?= count($expenses) ?> dépense(s)</small>
                 </div>
             </div>
@@ -42,7 +41,7 @@
                     <h6 class="card-subtitle mb-2 opacity-75">Ce mois
                         (<?= date('m/Y') ?>)</h6>
                     <h3 class="card-title mb-0">
-                        <?= number_format($monthlyTotal, 2, ',', ' ') ?> EUR
+                        <?= number_format($monthlyTotal, 2, ',', ' ') ?> €
                     </h3>
                 </div>
             </div>
@@ -76,7 +75,7 @@
                     <span class="fw-bold">Budget global</span>
                     <span class="<?= $globalOver ? 'text-danger fw-bold' : '' ?>">
                         <?= number_format($monthlyTotal, 2, ',', ' ') ?> /
-                        <?= number_format($globalBudget, 2, ',', ' ') ?> EUR
+                        <?= number_format($globalBudget, 2, ',', ' ') ?> €
                         <?php if ($globalOver): ?>⚠️ dépassé<?php endif; ?>
                     </span>
                 </div>
@@ -100,7 +99,7 @@
                     </span>
                     <span class="<?= $b['over'] ? 'text-danger fw-bold' : '' ?>">
                         <?= number_format($b['spent'], 2, ',', ' ') ?> /
-                        <?= number_format($b['budget'], 2, ',', ' ') ?> EUR
+                        <?= number_format($b['budget'], 2, ',', ' ') ?> €
                         <?php if ($b['over']): ?>⚠️<?php endif; ?>
                     </span>
                 </div>
@@ -204,7 +203,7 @@
                     <small class="text-muted"><?= count($filtered) ?>
                         dépense(s) · Total filtré :
                         <?= number_format($filteredTotal, 2, ',', ' ') ?>
-                        EUR</small>
+                        €</small>
                 </div>
                 <?php endif; ?>
             </form>
@@ -214,8 +213,8 @@
                 <thead class="table-light">
                     <tr>
                         <th>Date</th>
-                        <th>Libelle</th>
-                        <th>Categorie</th>
+                        <th>Libellé</th>
+                        <th>Catégorie</th>
                         <th class="text-end">Montant</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -255,7 +254,7 @@
                         </td>
                         <td class="text-end fw-bold">
                             <?= number_format($d['amount'], 2, ',', ' ') ?>
-                            EUR</td>
+                            €</td>
                         <td class="text-end">
                             <a href="/depenses/modifier?id=<?= (int) $d['id_expense'] ?>"
                                 class="btn btn-sm btn-outline-secondary">Modifier</a>
@@ -277,7 +276,7 @@
     </div>
 
     <div class="card mb-4">
-        <div class="card-header"><strong>Categories disponibles</strong>
+        <div class="card-header"><strong>Catégories disponibles</strong>
         </div>
         <div class="card-body">
             <?php foreach ($categories as $cat): ?>
@@ -321,7 +320,7 @@ $monthChartData = [
                 tooltip: {
                     callbacks: {
                         label: (c) => `${c.label}: ` +
-                            c.parsed.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
+                            c.parsed.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €'
                     }
                 }
             }
@@ -336,7 +335,7 @@ $monthChartData = [
         data: {
             labels: monthChart.labels,
             datasets: [{
-                label: 'Dépenses (EUR)',
+                label: 'Dépenses (€)',
                 data: monthChart.data,
                 borderColor: '#0d6efd',
                 backgroundColor: 'rgba(13,110,253,0.08)',
@@ -352,7 +351,7 @@ $monthChartData = [
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: (c) => c.parsed.y.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
+                        label: (c) => c.parsed.y.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €'
                     }
                 }
             },
