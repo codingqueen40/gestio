@@ -9,8 +9,9 @@ $mainMenu = [
 
 // Entrées réservées aux utilisateurs connectés (pages protégées).
 if (isLoggedIn()) {
-    $mainMenu['/budgets']    = 'Budgets';
-    $mainMenu['/categories'] = 'Catégories';
+    $mainMenu['/budgets']      = 'Budgets';
+    $mainMenu['/categories']   = 'Catégories';
+    $mainMenu['/recurrences']  = 'Récurrences';
 }
 
 // Chemin courant fourni par le front controller (fallback sur '/').

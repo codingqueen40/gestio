@@ -10,6 +10,7 @@ require_once __DIR__ . '/../src/libs/user.php';
 require_once __DIR__ . '/../src/libs/category.php';
 require_once __DIR__ . '/../src/libs/expense.php';
 require_once __DIR__ . '/../src/libs/budget.php';
+require_once __DIR__ . '/../src/libs/recurring.php';
 
 $routes = require __DIR__ . '/../src/routes.php';
 

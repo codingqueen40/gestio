@@ -163,6 +163,42 @@ ALTER TABLE `category`
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `recurring_expense` (dépenses mensuelles automatiques)
+--
+
+CREATE TABLE `recurring_expense` (
+  `id_recurring` int NOT NULL AUTO_INCREMENT,
+  `id_user` int NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `amount` decimal(15,2) NOT NULL,
+  `id_category` int NOT NULL,
+  `day_of_month` tinyint NOT NULL DEFAULT '1',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_recurring`),
+  KEY `id_user` (`id_user`),
+  KEY `id_category` (`id_category`),
+  CONSTRAINT `recurring_expense_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `recurring_expense_ibfk_2` FOREIGN KEY (`id_category`) REFERENCES `category` (`id_category`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `recurring_expense_log` (trace des mois déjà générés)
+--
+
+CREATE TABLE `recurring_expense_log` (
+  `id_log` int NOT NULL AUTO_INCREMENT,
+  `id_recurring` int NOT NULL,
+  `year_month` char(7) NOT NULL,
+  PRIMARY KEY (`id_log`),
+  UNIQUE KEY `uq_log_recurring_month` (`id_recurring`,`year_month`),
+  CONSTRAINT `recurring_expense_log_ibfk_1` FOREIGN KEY (`id_recurring`) REFERENCES `recurring_expense` (`id_recurring`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `budget` (plafond mensuel récurrent par catégorie et par utilisateur)
 --
 

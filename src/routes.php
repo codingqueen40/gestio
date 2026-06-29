@@ -31,6 +31,13 @@ return [
 
     'GET /contact'             => 'contact.php',
 
+    'GET /recurrences'              => 'recurrences.php',
+    'GET /recurrences/ajouter'      => 'recurrence_add.php',
+    'POST /recurrences/ajouter'     => 'recurrence_add.php',
+    'GET /recurrences/modifier'     => 'recurrence_edit.php',
+    'POST /recurrences/modifier'    => 'recurrence_edit.php',
+    'POST /recurrences/supprimer'   => 'recurrence_delete.php',
+
     'GET /depenses/exporter'   => 'expense_export.php',
     'GET /depenses/importer'   => 'expense_import.php',
     'POST /depenses/importer'  => 'expense_import.php',
