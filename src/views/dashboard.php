@@ -8,6 +8,12 @@
 
 <div class="container">
 
+    <?php if ($generatedCount > 0): ?>
+    <div class="alert alert-info">
+        <?= $generatedCount ?> dépense<?= $generatedCount > 1 ? 's récurrentes ont été générées' : ' récurrente a été générée' ?> automatiquement ce mois-ci.
+    </div>
+    <?php endif; ?>
+
     <?php if (isset($_GET['added'])): ?>
     <div class="alert alert-success">Dépense ajoutée avec succès.</div>
     <?php endif; ?>

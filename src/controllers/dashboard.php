@@ -2,6 +2,9 @@
 /** Tableau de bord personnel — réservé aux utilisateurs connectés. */
 requireLogin();
 
+// Génère les dépenses récurrentes actives arrivées à échéance ce mois.
+$generatedCount = generateRecurringExpenses($pdo, currentUserId());
+
 $categories   = getCategories($pdo, currentUserId());
 $expenses     = getExpensesByUser($pdo, currentUserId());
 
