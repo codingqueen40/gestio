@@ -42,6 +42,11 @@
             </select>
         </div>
 
+        <div class="mb-3">
+            <label for="note" class="form-label">Note <span class="text-muted small">(optionnel)</span></label>
+            <textarea class="form-control" id="note" name="note" rows="2"><?= htmlspecialchars($old['note']) ?></textarea>
+        </div>
+
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary">Ajouter</button>
             <a href="/" class="btn btn-outline-secondary">Annuler</a>

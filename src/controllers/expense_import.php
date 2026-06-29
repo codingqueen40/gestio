@@ -80,7 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 continue;
             }
 
-            addExpense($pdo, $userId, $title, (float) $amount, $date, $catId);
+            $note = isset($row[4]) ? trim($row[4]) : '';
+            addExpense($pdo, $userId, $title, (float) $amount, $date, $catId, $note);
             $imported++;
         }
 
