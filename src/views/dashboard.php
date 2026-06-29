@@ -143,10 +143,13 @@
 
     <div class="card mb-4">
         <div class="card-header">
-            <div
-                class="d-flex justify-content-between align-items-center mb-2">
-                <strong>Dernieres depenses</strong>
-                <a href="/depenses/ajouter" class="btn btn-sm btn-primary">+ Ajouter</a>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Dernières dépenses</strong>
+                <div class="d-flex gap-2">
+                    <a href="/depenses/exporter" class="btn btn-sm btn-outline-secondary">Exporter CSV</a>
+                    <a href="/depenses/importer" class="btn btn-sm btn-outline-secondary">Importer CSV</a>
+                    <a href="/depenses/ajouter" class="btn btn-sm btn-primary">+ Ajouter</a>
+                </div>
             </div>
             <form method="get" action="/" class="row g-2 align-items-end">
                 <div class="col-auto">
