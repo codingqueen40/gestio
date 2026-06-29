@@ -31,6 +31,10 @@ return [
 
     'GET /contact'             => 'contact.php',
 
+    'GET /depenses/exporter'   => 'expense_export.php',
+    'GET /depenses/importer'   => 'expense_import.php',
+    'POST /depenses/importer'  => 'expense_import.php',
+
     'GET /depenses/ajouter'    => 'expense_add.php',
     'POST /depenses/ajouter'   => 'expense_add.php',
 
