@@ -131,6 +131,17 @@
     </div>
 
     <div class="card mb-4">
+        <div class="card-header"><strong>Évolution mensuelle</strong></div>
+        <div class="card-body">
+            <?php if (count($byMonth) === 0): ?>
+            <p class="text-muted mb-0">Aucune donnée à afficher.</p>
+            <?php else: ?>
+            <canvas id="monthlyChart" height="120"></canvas>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="card mb-4">
         <div class="card-header">
             <div
                 class="d-flex justify-content-between align-items-center mb-2">
@@ -259,40 +270,83 @@
 
 </div>
 
-<?php if (count($byCategory) > 0): ?>
+<?php if (count($byCategory) > 0 || count($byMonth) > 0): ?>
 <?php
-// Encodage sûr pour injection dans <script> (évite toute cassure </script>).
-$jsonFlags  = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
-$chartData  = [
+$jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+$catChartData = [
     'labels' => array_column($byCategory, 'name'),
     'data'   => array_map(static fn ($c) => round($c['total'], 2), $byCategory),
     'colors' => array_column($byCategory, 'color'),
 ];
+$monthChartData = [
+    'labels' => array_column($byMonth, 'label'),
+    'data'   => array_column($byMonth, 'total'),
+];
 ?>
-<script
-    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
-    (function () {
-        const chart = <?= json_encode($chartData, $jsonFlags) ?>;
-        new Chart(document.getElementById('categoryChart'), {
-            type: 'doughnut',
-            data: {
-                labels: chart.labels,
-                datasets: [{ data: chart.data, backgroundColor: chart.colors }]
-            },
-            options: {
-                plugins: {
-                    legend: { position: 'bottom' },
-                    tooltip: {
-                        callbacks: {
-                            label: (c) => `${c.label}: ` +
-                                c.parsed.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
-                        }
+(function () {
+    <?php if (count($byCategory) > 0): ?>
+    const catChart = <?= json_encode($catChartData, $jsonFlags) ?>;
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: catChart.labels,
+            datasets: [{ data: catChart.data, backgroundColor: catChart.colors }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: (c) => `${c.label}: ` +
+                            c.parsed.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
                     }
                 }
             }
-        });
-    })();
+        }
+    });
+    <?php endif; ?>
+
+    <?php if (count($byMonth) > 0): ?>
+    const monthChart = <?= json_encode($monthChartData, $jsonFlags) ?>;
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'line',
+        data: {
+            labels: monthChart.labels,
+            datasets: [{
+                label: 'Dépenses (EUR)',
+                data: monthChart.data,
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13,110,253,0.08)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (c) => c.parsed.y.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: (v) => v.toLocaleString('fr-FR') + ' €'
+                    }
+                }
+            }
+        }
+    });
+    <?php endif; ?>
+})();
 </script>
 <?php endif; ?>
 
