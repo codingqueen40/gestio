@@ -25,3 +25,12 @@ RUN { \
     } > /usr/local/etc/php/conf.d/zz-app.ini
 
 WORKDIR /var/www/html
+
+# Relay SMTP via msmtp — PHP mail() s'en sert comme sendmail en prod.
+RUN apt-get update && apt-get install -y --no-install-recommends msmtp msmtp-mta \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY php/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+CMD ["/usr/local/bin/entrypoint.sh"]
