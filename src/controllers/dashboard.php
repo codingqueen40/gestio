@@ -2,7 +2,7 @@
 /** Tableau de bord personnel — réservé aux utilisateurs connectés. */
 requireLogin();
 
-$categories   = getCategories($pdo);
+$categories   = getCategories($pdo, currentUserId());
 $expenses     = getExpensesByUser($pdo, currentUserId());
 
 // Cartes KPI : toujours calculées sur l'ensemble des dépenses (indépendant des filtres).

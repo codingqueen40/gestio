@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "La date n'est pas valide";
     }
 
-    if (!in_array((int) $old['category'], array_map('intval', getCategoryIds($pdo)), true)) {
+    if (!in_array((int) $old['category'], array_map('intval', getCategoryIds($pdo, currentUserId())), true)) {
         $errors[] = "La catégorie sélectionnée n'existe pas";
     }
 
@@ -56,6 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$categories = getCategories($pdo);
+$categories = getCategories($pdo, currentUserId());
 
 require __DIR__ . '/../views/expense_add.php';

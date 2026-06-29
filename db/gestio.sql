@@ -30,21 +30,24 @@ SET time_zone = "+00:00";
 CREATE TABLE `category` (
   `id_category` int NOT NULL,
   `name` varchar(50) NOT NULL,
-  `color` varchar(7) NOT NULL
+  `color` varchar(7) NOT NULL,
+  `id_user` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `category`
+-- (catégories par défaut du compte de démonstration Eva ; chaque nouveau
+--  compte reçoit sa propre copie via seedDefaultCategories() à l'inscription)
 --
 
-INSERT INTO `category` (`id_category`, `name`, `color`) VALUES
-(1, 'Food', '#28a745'),
-(2, 'Travel', '#007bff'),
-(3, 'Housing', '#dc3545'),
-(4, 'Hobbies', '#ffc107'),
-(5, 'Health', '#17a2b8'),
-(6, 'Education', '#6610f2'),
-(7, 'Other', '#6c757d');
+INSERT INTO `category` (`id_category`, `name`, `color`, `id_user`) VALUES
+(1, 'Food', '#28a745', 1),
+(2, 'Travel', '#007bff', 1),
+(3, 'Housing', '#dc3545', 1),
+(4, 'Hobbies', '#ffc107', 1),
+(5, 'Health', '#17a2b8', 1),
+(6, 'Education', '#6610f2', 1),
+(7, 'Other', '#6c757d', 1);
 
 -- --------------------------------------------------------
 
@@ -99,7 +102,8 @@ INSERT INTO `user` (`id_user`, `username`, `email`, `password`) VALUES
 -- Index pour la table `category`
 --
 ALTER TABLE `category`
-  ADD PRIMARY KEY (`id_category`);
+  ADD PRIMARY KEY (`id_category`),
+  ADD KEY `id_user` (`id_user`);
 
 --
 -- Index pour la table `expense`
@@ -148,6 +152,12 @@ ALTER TABLE `user`
 ALTER TABLE `expense`
   ADD CONSTRAINT `expense_ibfk_1` FOREIGN KEY (`id_category`) REFERENCES `category` (`id_category`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `expense_ibfk_2` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `category`
+--
+ALTER TABLE `category`
+  ADD CONSTRAINT `category_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- --------------------------------------------------------
 

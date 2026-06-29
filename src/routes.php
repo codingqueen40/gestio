@@ -20,6 +20,13 @@ return [
     'GET /budgets'             => 'budgets.php',
     'POST /budgets'            => 'budgets.php',
 
+    'GET /categories'            => 'categories.php',
+    'GET /categories/ajouter'    => 'category_add.php',
+    'POST /categories/ajouter'   => 'category_add.php',
+    'GET /categories/modifier'   => 'category_edit.php',
+    'POST /categories/modifier'  => 'category_edit.php',
+    'POST /categories/supprimer' => 'category_delete.php',
+
     'GET /about'               => 'about.php',
 
     'GET /contact'             => 'contact.php',

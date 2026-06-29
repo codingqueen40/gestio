@@ -36,6 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $res = addUser($pdo, $old['username'], $old['email'], $password);
 
         if ($res) {
+            // Chaque nouveau compte démarre avec sa propre copie des catégories par défaut.
+            seedDefaultCategories($pdo, (int) $pdo->lastInsertId());
+
             header("Location: /login?registered=1");
             exit;
         } else {
