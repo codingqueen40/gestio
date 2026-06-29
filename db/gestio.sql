@@ -78,7 +78,8 @@ CREATE TABLE `user` (
   `id_user` int NOT NULL,
   `username` varchar(50) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `monthly_budget` decimal(15,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -147,6 +148,40 @@ ALTER TABLE `user`
 ALTER TABLE `expense`
   ADD CONSTRAINT `expense_ibfk_1` FOREIGN KEY (`id_category`) REFERENCES `category` (`id_category`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `expense_ibfk_2` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `budget` (plafond mensuel récurrent par catégorie et par utilisateur)
+--
+
+CREATE TABLE `budget` (
+  `id_budget` int NOT NULL,
+  `id_user` int NOT NULL,
+  `id_category` int NOT NULL,
+  `amount` decimal(15,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Index pour la table `budget`
+--
+ALTER TABLE `budget`
+  ADD PRIMARY KEY (`id_budget`),
+  ADD UNIQUE KEY `uq_budget_user_cat` (`id_user`,`id_category`),
+  ADD KEY `id_category` (`id_category`);
+
+--
+-- AUTO_INCREMENT pour la table `budget`
+--
+ALTER TABLE `budget`
+  MODIFY `id_budget` int NOT NULL AUTO_INCREMENT;
+
+--
+-- Contraintes pour la table `budget`
+--
+ALTER TABLE `budget`
+  ADD CONSTRAINT `budget_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `budget_ibfk_2` FOREIGN KEY (`id_category`) REFERENCES `category` (`id_category`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
