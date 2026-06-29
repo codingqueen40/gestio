@@ -4,9 +4,8 @@ require_once __DIR__ . '/../libs/auth.php';
 $theme = in_array($_COOKIE['theme'] ?? '', ['light', 'dark']) ? $_COOKIE['theme'] : 'light';
 
 $mainMenu = [
-    '/'        => 'Accueil',
-    '/about'   => 'À propos',
-    '/contact' => 'Contact',
+    '/'      => 'Accueil',
+    '/about' => 'À propos',
 ];
 
 // Entrées réservées aux utilisateurs connectés (pages protégées).
