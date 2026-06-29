@@ -24,14 +24,13 @@
     <div class="alert alert-success">Dépense supprimée.</div>
     <?php endif; ?>
 
-    <div class="row mb-4">
+    <div class="row g-3 mb-4">
         <div class="col-md-6">
             <div class="card text-bg-primary h-100">
                 <div class="card-body">
-                    <h6 class="card-subtitle mb-2 opacity-75">Total general
-                    </h6>
+                    <h6 class="card-subtitle mb-2 opacity-75">Total général</h6>
                     <h3 class="card-title mb-0">
-                        <?= number_format($total, 2, ',', ' ') ?> EUR</h3>
+                        <?= number_format($total, 2, ',', ' ') ?> €</h3>
                     <small><?= count($expenses) ?> dépense(s)</small>
                 </div>
             </div>
@@ -42,7 +41,7 @@
                     <h6 class="card-subtitle mb-2 opacity-75">Ce mois
                         (<?= date('m/Y') ?>)</h6>
                     <h3 class="card-title mb-0">
-                        <?= number_format($monthlyTotal, 2, ',', ' ') ?> EUR
+                        <?= number_format($monthlyTotal, 2, ',', ' ') ?> €
                     </h3>
                 </div>
             </div>
@@ -59,7 +58,7 @@
     };
     ?>
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
             <strong>Budgets du mois (<?= date('m/Y') ?>)</strong>
             <a href="/budgets" class="btn btn-sm btn-outline-primary">Gérer les budgets</a>
         </div>
@@ -72,11 +71,11 @@
 
             <?php if ($globalBudget !== null): ?>
             <div class="mb-4">
-                <div class="d-flex justify-content-between mb-1">
+                <div class="d-flex flex-wrap justify-content-between gap-1 mb-1">
                     <span class="fw-bold">Budget global</span>
                     <span class="<?= $globalOver ? 'text-danger fw-bold' : '' ?>">
                         <?= number_format($monthlyTotal, 2, ',', ' ') ?> /
-                        <?= number_format($globalBudget, 2, ',', ' ') ?> EUR
+                        <?= number_format($globalBudget, 2, ',', ' ') ?> €
                         <?php if ($globalOver): ?>⚠️ dépassé<?php endif; ?>
                     </span>
                 </div>
@@ -92,7 +91,7 @@
 
             <?php foreach ($budgetRows as $b): ?>
             <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1">
+                <div class="d-flex flex-wrap justify-content-between gap-1 mb-1">
                     <span>
                         <span class="badge" style="background-color: <?= htmlspecialchars($b['color']) ?>">
                             <?= htmlspecialchars($b['name']) ?>
@@ -100,7 +99,7 @@
                     </span>
                     <span class="<?= $b['over'] ? 'text-danger fw-bold' : '' ?>">
                         <?= number_format($b['spent'], 2, ',', ' ') ?> /
-                        <?= number_format($b['budget'], 2, ',', ' ') ?> EUR
+                        <?= number_format($b['budget'], 2, ',', ' ') ?> €
                         <?php if ($b['over']): ?>⚠️<?php endif; ?>
                     </span>
                 </div>
@@ -149,16 +148,16 @@
 
     <div class="card mb-4">
         <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                 <strong>Dernières dépenses</strong>
-                <div class="d-flex gap-2">
-                    <a href="/depenses/exporter" class="btn btn-sm btn-outline-secondary">Exporter CSV</a>
-                    <a href="/depenses/importer" class="btn btn-sm btn-outline-secondary">Importer CSV</a>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="/depenses/exporter-pdf" class="btn btn-sm btn-outline-secondary">Exporter PDF</a>
+                    <a href="/depenses/importer-pdf" class="btn btn-sm btn-outline-secondary">Importer PDF</a>
                     <a href="/depenses/ajouter" class="btn btn-sm btn-primary">+ Ajouter</a>
                 </div>
             </div>
             <form method="get" action="/" class="row g-2 align-items-end">
-                <div class="col-auto">
+                <div class="col-12 col-sm-auto">
                     <label for="month" class="form-label small mb-1">Mois</label>
                     <select id="month" name="month"
                         class="form-select form-select-sm">
@@ -171,7 +170,7 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-auto">
+                <div class="col-12 col-sm-auto">
                     <label for="category"
                         class="form-label small mb-1">Catégorie</label>
                     <select id="category" name="category"
@@ -185,14 +184,14 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-auto">
+                <div class="col-12 col-sm-auto">
                     <label for="search" class="form-label small mb-1">Recherche</label>
                     <input type="text" id="search" name="search"
                         class="form-control form-control-sm"
                         placeholder="Libellé…"
                         value="<?= htmlspecialchars($filterSearch) ?>">
                 </div>
-                <div class="col-auto">
+                <div class="col-12 col-sm-auto">
                     <button type="submit"
                         class="btn btn-sm btn-outline-primary">Filtrer</button>
                     <?php if ($hasFilter): ?>
@@ -204,7 +203,7 @@
                     <small class="text-muted"><?= count($filtered) ?>
                         dépense(s) · Total filtré :
                         <?= number_format($filteredTotal, 2, ',', ' ') ?>
-                        EUR</small>
+                        €</small>
                 </div>
                 <?php endif; ?>
             </form>
@@ -214,8 +213,8 @@
                 <thead class="table-light">
                     <tr>
                         <th>Date</th>
-                        <th>Libelle</th>
-                        <th>Categorie</th>
+                        <th>Libellé</th>
+                        <th>Catégorie</th>
                         <th class="text-end">Montant</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -255,7 +254,7 @@
                         </td>
                         <td class="text-end fw-bold">
                             <?= number_format($d['amount'], 2, ',', ' ') ?>
-                            EUR</td>
+                            €</td>
                         <td class="text-end">
                             <a href="/depenses/modifier?id=<?= (int) $d['id_expense'] ?>"
                                 class="btn btn-sm btn-outline-secondary">Modifier</a>
@@ -277,7 +276,7 @@
     </div>
 
     <div class="card mb-4">
-        <div class="card-header"><strong>Categories disponibles</strong>
+        <div class="card-header"><strong>Catégories disponibles</strong>
         </div>
         <div class="card-body">
             <?php foreach ($categories as $cat): ?>
@@ -321,7 +320,7 @@ $monthChartData = [
                 tooltip: {
                     callbacks: {
                         label: (c) => `${c.label}: ` +
-                            c.parsed.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
+                            c.parsed.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €'
                     }
                 }
             }
@@ -336,7 +335,7 @@ $monthChartData = [
         data: {
             labels: monthChart.labels,
             datasets: [{
-                label: 'Dépenses (EUR)',
+                label: 'Dépenses (€)',
                 data: monthChart.data,
                 borderColor: '#0d6efd',
                 backgroundColor: 'rgba(13,110,253,0.08)',
@@ -352,7 +351,7 @@ $monthChartData = [
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: (c) => c.parsed.y.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' EUR'
+                        label: (c) => c.parsed.y.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €'
                     }
                 }
             },

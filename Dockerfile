@@ -26,8 +26,8 @@ RUN { \
 
 WORKDIR /var/www/html
 
-# Relay SMTP via msmtp — PHP mail() s'en sert comme sendmail en prod.
-RUN apt-get update && apt-get install -y --no-install-recommends msmtp msmtp-mta \
+# msmtp (relay SMTP) + poppler-utils (pdftotext pour l'import PDF).
+RUN apt-get update && apt-get install -y --no-install-recommends msmtp msmtp-mta poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
 COPY php/entrypoint.sh /usr/local/bin/entrypoint.sh

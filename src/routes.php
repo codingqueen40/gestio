@@ -35,8 +35,6 @@ return [
 
     'GET /about'               => 'about.php',
 
-    'GET /contact'             => 'contact.php',
-
     'GET /recurrences'              => 'recurrences.php',
     'GET /recurrences/ajouter'      => 'recurrence_add.php',
     'POST /recurrences/ajouter'     => 'recurrence_add.php',
@@ -44,9 +42,10 @@ return [
     'POST /recurrences/modifier'    => 'recurrence_edit.php',
     'POST /recurrences/supprimer'   => 'recurrence_delete.php',
 
-    'GET /depenses/exporter'   => 'expense_export.php',
-    'GET /depenses/importer'   => 'expense_import.php',
-    'POST /depenses/importer'  => 'expense_import.php',
+    'GET /depenses/exporter-pdf'  => 'expense_export_pdf.php',
+
+    'GET /depenses/importer-pdf'  => 'expense_import_pdf.php',
+    'POST /depenses/importer-pdf' => 'expense_import_pdf.php',
 
     'GET /depenses/ajouter'    => 'expense_add.php',
     'POST /depenses/ajouter'   => 'expense_add.php',

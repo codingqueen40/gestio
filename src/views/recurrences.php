@@ -51,7 +51,7 @@
                             <?php endif; ?>
                         </td>
                         <td class="text-end fw-bold">
-                            <?= number_format($r['amount'], 2, ',', ' ') ?> EUR
+                            <?= number_format($r['amount'], 2, ',', ' ') ?> €
                         </td>
                         <td class="text-center">le <?= (int) $r['day_of_month'] ?></td>
                         <td class="text-center">

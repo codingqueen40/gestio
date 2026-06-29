@@ -17,7 +17,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="amount" class="form-label">Montant (EUR)</label>
+            <label for="amount" class="form-label">Montant (€)</label>
             <input type="number" step="0.01" min="0.01" class="form-control"
                 id="amount" name="amount"
                 value="<?= htmlspecialchars($old['amount']) ?>" required>
