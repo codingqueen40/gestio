@@ -16,10 +16,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = getUserByEmail($pdo, $email);
 
         if ($user !== null) {
-            $token    = createPasswordReset($pdo, (int) $user['id_user']);
-            $proto    = (getenv('APP_ENV') === 'production') ? 'https' : 'http';
-            $host     = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            $resetUrl = "$proto://$host/reinitialiser-mdp?token=$token";
+            $token = createPasswordReset($pdo, (int) $user['id_user']);
+
+            // En prod, on bâtit le lien depuis APP_URL (URL canonique injectée par
+            // docker-compose) et JAMAIS depuis l'en-tête Host fourni par le client,
+            // qui est falsifiable (empoisonnement du lien de reset, #42).
+            // Hors prod (dev local), on retombe sur le Host courant pour rester pratique.
+            $appUrl = getenv('APP_URL');
+            if ($appUrl) {
+                $base = rtrim($appUrl, '/');
+            } else {
+                $proto = (getenv('APP_ENV') === 'production') ? 'https' : 'http';
+                $host  = $_SERVER['HTTP_HOST'] ?? 'localhost';
+                $base  = "$proto://$host";
+            }
+            $resetUrl = "$base/reinitialiser-mdp?token=$token";
 
             $subject = 'Réinitialisation de ton mot de passe — Gestio';
             $body    = "Bonjour {$user['username']},\n\n"

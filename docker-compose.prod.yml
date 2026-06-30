@@ -21,6 +21,9 @@ services:
     restart: always
     environment:
       APP_ENV: production
+      # URL publique canonique : utilisée pour bâtir les liens des emails
+      # (reset mot de passe) sans dépendre de l'en-tête Host du client (#42).
+      APP_URL: https://${DOMAIN}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER:-}
