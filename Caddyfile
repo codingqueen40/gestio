@@ -1,3 +1,21 @@
 {$DOMAIN} {
-    reverse_proxy php:80
+	reverse_proxy php:80
+
+	# En-têtes de sécurité (appliqués à toutes les réponses) — ticket #23.
+	header {
+		# HTTPS forcé pour 1 an (preload). Caddy gère déjà le certificat Let's Encrypt.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		# Empêche le navigateur de "deviner" un type MIME (anti-sniffing).
+		X-Content-Type-Options "nosniff"
+		# Anti-clickjacking : la page ne peut pas être chargée dans une iframe.
+		X-Frame-Options "DENY"
+		# Ne fuite pas l'URL complète vers les sites tiers.
+		Referrer-Policy "strict-origin-when-cross-origin"
+		# Politique de contenu : ressources locales + CDN jsdelivr (Bootstrap, Chart.js,
+		# Bootstrap Icons). 'unsafe-inline' requis par les scripts/styles inline
+		# (toggle thème, init Chart.js) — durcissement par nonce = évolution future.
+		Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+		# Ne pas révéler que le serveur tourne sous Caddy.
+		-Server
+	}
 }
