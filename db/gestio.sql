@@ -197,6 +197,24 @@ CREATE TABLE `password_reset` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `login_attempt` (anti-brute-force /login, #24)
+-- Trace les échecs de connexion par IP et par email pour appliquer un
+-- verrouillage temporaire. Pas de FK : l'email peut viser un compte inexistant.
+--
+
+CREATE TABLE `login_attempt` (
+  `id_attempt` int NOT NULL AUTO_INCREMENT,
+  `ip` varchar(45) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `attempted_at` datetime NOT NULL,
+  PRIMARY KEY (`id_attempt`),
+  KEY `idx_ip_time` (`ip`,`attempted_at`),
+  KEY `idx_email_time` (`email`,`attempted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `recurring_expense` (dépenses mensuelles automatiques)
 --
 
