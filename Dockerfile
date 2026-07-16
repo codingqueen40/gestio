@@ -4,8 +4,8 @@ FROM php:8.4-apache
 RUN docker-php-ext-install mysqli pdo pdo_mysql \
     && docker-php-ext-enable mysqli
 
-# Enable mod_rewrite (useful for clean URLs later)
-RUN a2enmod rewrite
+# Enable mod_rewrite (clean URLs) and mod_headers (security headers, ticket #23)
+RUN a2enmod rewrite headers
 
 # Apache serves the public/ subfolder only.
 # Application code (config, templates, classes) lives in /var/www/html/src,
@@ -22,7 +22,14 @@ RUN { \
       echo "log_errors = On"; \
       echo "error_reporting = E_ALL"; \
       echo "date.timezone = Europe/Berlin"; \
+      echo "expose_php = Off"; \
     } > /usr/local/etc/php/conf.d/zz-app.ini
+
+# Security headers (ticket #23), portés par Apache — voir php/security-headers.conf.
+# Nommé "zz-" pour se charger APRÈS le security.conf de Debian (inclusion alphabétique),
+# sinon son "ServerTokens OS / ServerSignature On" écraserait nos "Prod / Off".
+COPY php/security-headers.conf /etc/apache2/conf-available/zz-security-headers.conf
+RUN a2enconf zz-security-headers
 
 WORKDIR /var/www/html
 
