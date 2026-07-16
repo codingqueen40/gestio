@@ -40,4 +40,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends msmtp msmtp-mta
 COPY php/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Code applicatif intégré à l'image (#45) — image autonome, fini la dépendance aux bind mounts.
+# public/ = document root (index.php, assets) ; src/ = code hors docroot (jamais servi via URL).
+# Placé en fin de Dockerfile : les couches de dépendances restent en cache, seul le code
+# invalide le build quand il change.
+COPY public/ /var/www/html/public/
+COPY src/   /var/www/html/src/
+
 CMD ["/usr/local/bin/entrypoint.sh"]
