@@ -21,9 +21,8 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:-}
-    volumes:
-      - ./public:/var/www/html/public
-      - ./src:/var/www/html/src
+    # Plus de bind mounts ./public / ./src (#45) : le code est intégré à l'image (COPY dans le Dockerfile).
+    # L'image est autonome et reproductible. Les mounts live-reload restent dans docker-compose.override.yml (dev).
     expose:
       - "80"                      # visible par Traefik, PAS par Internet
     depends_on:
