@@ -37,9 +37,14 @@ services:
   mysql:
     restart: always
     # NO "ports:" → MySQL is NEVER reachable from the outside in prod
-    command:
-      - --default-authentication-plugin=caching_sha2_password
-      - --bind-address=0.0.0.0
+    #
+    # PAS de "command:" ici. L'option --default-authentication-plugin a été
+    # SUPPRIMÉE dans MySQL 8.4.0 (dépréciée en 8.0.27) — mysqld refuse de démarrer
+    # sur une option inconnue, il ne l'ignore pas. Elle est remplacée par
+    # authentication_policy, mais caching_sha2_password est DÉJÀ le défaut en 8.4 :
+    # il n'y a donc rien à configurer.
+    # --bind-address était inutile aussi : l'image officielle écoute déjà sur 0.0.0.0.
+    # Réf : https://dev.mysql.com/doc/relnotes/mysql/8.4/en/news-8-4-0.html
     security_opt:
       - no-new-privileges:true
 

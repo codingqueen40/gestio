@@ -1,0 +1,56 @@
+# FICHIER COOLIFY — autonome, chargé SEUL (Coolify ne fait pas de merge -f).
+# Ton workflow dev (`docker compose up`) n'est pas affecté.
+#
+# Différences avec le dev :
+#   - pas de Caddy      → Traefik (fourni par Coolify) fait le proxy + le TLS
+#   - pas de phpMyAdmin, aucun `ports:` exposé
+#   - pas de `networks:` ni de `container_name:` → Coolify les gère (sinon : erreurs 504)
+services:
+  php:
+    build: .
+    restart: unless-stopped
+    environment:
+      APP_ENV: production
+      APP_URL: https://${DOMAIN}
+      DB_HOST: mysql
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+    volumes:
+      - ./public:/var/www/html/public
+      - ./src:/var/www/html/src
+    expose:
+      - "80"                      # visible par Traefik, PAS par Internet
+    depends_on:
+      mysql:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/gestio.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    security_opt:
+      - no-new-privileges:true
+    # AUCUN `ports:` → MySQL reste injoignable depuis Internet
+
+volumes:
+  mysql_data:
