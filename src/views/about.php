@@ -4,9 +4,12 @@
     <div class="py-5">
         <h1 class="fw-bold text-white">Codingqueen40</h1>
         <div class="col-lg-6 mx-auto">
-            <p class="fs-5 mb-4">Développeuse web passionnée, j'ai créé Gestio
-                pour apprendre et
-                mettre en pratique PHP, MySQL et Docker dans un projet concret.
+            <p class="fs-5 mb-4">
+                Gestio vous aide à savoir où part votre argent — un suivi de
+                dépenses clair, privé et sans abonnement, hébergé chez vous.
+                Il est conçu pour être simple, rapide et sécurisé, tout en
+                offrant une interface agréable pour suivre vos finances
+                personnelles.
             </p>
             <a href="#contact" class="btn btn-outline-info btn-lg px-4 fw-bold">
                 Me contacter</a>

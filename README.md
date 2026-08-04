@@ -4,7 +4,7 @@
 
 # Gestio — Expense Tracker
 
-**A minimalist personal expense tracker** — vanilla PHP · MySQL · Bootstrap, fully containerized for portable, secure local development.
+**Gestio is a self-hosted expense tracker that I built from scratch — A minimalist personal expense tracker** — vanilla PHP · MySQL · Bootstrap, fully containerized for portable, secure local development.
 
 ![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.4_LTS-4479A1?logo=mysql&logoColor=white)
@@ -12,6 +12,7 @@
 ![Apache](https://img.shields.io/badge/Apache-2.4-D22128?logo=apache&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
+[![Live](https://img.shields.io/badge/Live-gestio.codingqueen40.com-2ea44f?logo=googlechrome&logoColor=white)](https://gestio.codingqueen40.com)
 
 </div>
 
@@ -62,6 +63,7 @@ Built as part of my full-stack developer reconversion journey ([codingqueen40.co
 | Database | MySQL 8.4 LTS |
 | Admin UI | phpMyAdmin (dev only) |
 | Container runtime | Docker Compose v2 (OrbStack on macOS) |
+| Production hosting | netcup VPS (Debian 13) + Coolify (self-hosted PaaS) + Traefik + Let's Encrypt |
 | Editor | VSCode |
 
 ---
@@ -203,25 +205,71 @@ docker compose --env-file ~/secrets/gestio/.env down -v
 
 ## Production Deployment
 
-```bash
-# Explicitly load prod config, override.yml is ignored
-docker compose \
-  --env-file ~/secrets/gestio/.env \
-  -f docker-compose.yml \
-  -f docker-compose.prod.yml \
-  up -d
+**Live at [gestio.codingqueen40.com](https://gestio.codingqueen40.com)**, deployed on a self-hosted PaaS rather than a per-project free-tier host — the idea being one small VPS that can host several portfolio projects at once, each routed by domain name through a single reverse proxy.
+
+### Stack
+
+| Layer | Technology |
+|---|---|
+| Server | netcup VPS — Debian 13, 2 vCPU / 4 GB RAM (Nuremberg) |
+| Orchestration | [Coolify](https://coolify.io) (self-hosted PaaS) |
+| Reverse proxy / TLS | Traefik (bundled with Coolify) — automatic HTTPS via Let's Encrypt |
+| DNS | Cloudflare — `A` record, **DNS only** (grey cloud, required for the Let's Encrypt HTTP-01 challenge) |
+| Deploy source | Public GitHub repo, `main` branch, Coolify's **Docker Compose** build pack |
+| Compose file | [`docker-compose.coolify.yml`](docker-compose.coolify.yml) — a self-contained variant (no Caddy, no `networks:`/`container_name:` overrides) built specifically for Coolify/Traefik |
+
+### Architecture
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                          Internet                             │
+│      https://gestio.codingqueen40.com  (DNS: Cloudflare,      │
+│                  grey cloud — DNS only)                       │
+└───────────────────────────────┬────────────────────────────────┘
+                                 │ :443 HTTPS  (:80 → redirect)
+                                 ▼
+┌──────────────────────────────────────────────────────────────┐
+│           netcup VPS — Debian 13 (2 vCPU / 4 GB)               │
+│                                                                │
+│   ufw (22 / 80 / 443 open) + DOCKER-USER (iptables)            │
+│   → Coolify admin ports (8000 / 8080 / 6001-6002) closed       │
+│     to the outside world                                      │
+│                                                                │
+│   ┌────────────────────────────────────────────────────────┐  │
+│   │   Traefik (shipped with Coolify)                        │  │
+│   │   reverse proxy + automatic HTTPS (Let's Encrypt)        │  │
+│   └───────────────────────────┬────────────────────────────┘  │
+│                                │ routed by domain name          │
+│                                ▼                                │
+│   Docker network (Coolify project, isolated)                    │
+│   ┌──────────────┐        ┌──────────────┐                     │
+│   │  gestio_php   │  ←→   │ gestio_mysql │                     │
+│   │  PHP 8.4      │       │  MySQL 8.4   │                     │
+│   │  Apache       │       │  (no public  │                     │
+│   │  (internal)   │       │   port)      │                     │
+│   └──────────────┘        └──────────────┘                     │
+│                                                                 │
+│   Coolify dashboard → https://coolify.codingqueen40.com         │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-**Production differs from dev by:**
+Other projects can share the same VPS: Traefik routes each incoming request to the right container purely by domain name, so hosting cost stays flat (~5 €/month total) as the portfolio grows.
+
+### How a deploy works
+
+1. Push to `main` on GitHub (public repo — no deploy key needed).
+2. In Coolify: **Redeploy** — it clones the repo fresh and builds from `docker-compose.coolify.yml` using the **Docker Compose** build pack.
+3. Secrets (`MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `SMTP_*`, …) are set as environment variables inside Coolify's UI — masked, never committed to the repo.
+4. Traefik picks up the new container and routes `gestio.codingqueen40.com` to it automatically; TLS is renewed by Let's Encrypt without manual steps.
+
+### Production hardening
 
 - No phpMyAdmin (never exposed publicly)
-- MySQL port not exposed externally
+- MySQL not reachable from outside the Docker network
 - `display_errors` stays **off** (errors logged, never shown to visitors)
-- `no-new-privileges` security flag enabled
-- `restart: always` (auto-restart after host reboot)
-- Stricter password hashing (`caching_sha2_password`)
-
-**Before deploying:** put a reverse proxy (Caddy or Traefik) in front for HTTPS via Let's Encrypt.
+- SSH: key-only login, password authentication disabled
+- Host firewall (`ufw`) + `DOCKER-USER` iptables rules close every Coolify management port to the internet — only 22/80/443 are reachable
+- Security headers applied at the Apache level (portable behind any reverse proxy)
 
 ---
 
