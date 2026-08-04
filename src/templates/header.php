@@ -46,7 +46,7 @@ $currentPage = $currentPath ?? '/';
             class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
             <div class="col-md-3 mb-2 mb-md-0"> <a href="/"
                     class="d-inline-flex link-body-emphasis text-decoration-none">
-                    <img src="/assets/images/logo_gestio_cropped.png"
+                    <img src="/assets/images/logo-gestio-2.png"
                         alt="logo Gestio" width="200">
                 </a>
             </div>
@@ -80,7 +80,8 @@ $currentPage = $currentPath ?? '/';
                         class="btn btn-outline-danger">Déconnexion</button>
                 </form>
                 <?php else: ?>
-                <a href="/login" class="btn btn-outline-primary me-2">Connexion</a>
+                <a href="/login"
+                    class="btn btn-outline-primary me-2">Connexion</a>
                 <a href="/signup" class="btn btn-primary">S'inscrire</a>
                 <?php endif; ?>
             </div>
