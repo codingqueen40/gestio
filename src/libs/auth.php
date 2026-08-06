@@ -152,13 +152,18 @@ function checkRememberToken(PDO $pdo): void
         return;
     }
     $hash = hash('sha256', $token);
+    // expires_at est écrit par PHP (date.timezone = Europe/Berlin) : on le
+    // compare donc à l'horloge PHP, et non à NOW() qui suit le fuseau de
+    // MySQL (UTC dans le conteneur). Sinon le décalage fausse la durée de
+    // vie du token — et s'inverserait en tokens morts-nés si un jour PHP
+    // passait derrière MySQL.
     $stmt = $pdo->prepare("
         SELECT r.id_token, r.id_user, u.username
         FROM remember_token r
         JOIN `user` u ON r.id_user = u.id_user
-        WHERE r.token_hash = :hash AND r.expires_at > NOW()
+        WHERE r.token_hash = :hash AND r.expires_at > :now
     ");
-    $stmt->execute([':hash' => $hash]);
+    $stmt->execute([':hash' => $hash, ':now' => date('Y-m-d H:i:s')]);
     $row = $stmt->fetch();
 
     if ($row === false) {
@@ -204,11 +209,16 @@ function validatePasswordReset(PDO $pdo, string $token): ?array
         return null;
     }
     $hash = hash('sha256', $token);
+    // expires_at est écrit par PHP (date.timezone = Europe/Berlin) : on le
+    // compare donc à l'horloge PHP, et non à NOW() qui suit le fuseau de
+    // MySQL (UTC dans le conteneur). Sinon le décalage fausse la durée de
+    // vie du token — et s'inverserait en tokens morts-nés si un jour PHP
+    // passait derrière MySQL.
     $stmt = $pdo->prepare("
         SELECT id_reset, id_user FROM password_reset
-        WHERE token_hash = :hash AND expires_at > NOW()
+        WHERE token_hash = :hash AND expires_at > :now
     ");
-    $stmt->execute([':hash' => $hash]);
+    $stmt->execute([':hash' => $hash, ':now' => date('Y-m-d H:i:s')]);
     $row = $stmt->fetch();
     return $row === false ? null : $row;
 }
