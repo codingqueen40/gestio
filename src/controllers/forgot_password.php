@@ -36,7 +36,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $body    = "Bonjour {$user['username']},\n\n"
                 . "Clique sur ce lien pour réinitialiser ton mot de passe :\n$resetUrl\n\n"
                 . "Ce lien expire dans 1 heure. Si tu n'es pas à l'origine de cette demande, ignore cet email.";
-            @mail($email, $subject, $body, "From: noreply@gestio.local");
+
+            // L'expéditeur DOIT être l'adresse vérifiée chez le relais (SMTP_FROM) :
+            // le relais refuse un From non vérifié, et DMARC s'aligne sur le domaine
+            // de cet en-tête. Un domaine inventé (.local) ferait échouer les deux.
+            $from = getenv('SMTP_FROM') ?: 'noreply@gestio.local';
+
+            // Le fallback n'a de sens qu'en dev. En prod, un SMTP_FROM vide rejouerait
+            // silencieusement le bug d'origine (domaine .local => rejet Brevo + DMARC KO) :
+            // on le trace, sinon la panne est invisible.
+            if (!getenv('SMTP_FROM') && getenv('APP_ENV') === 'production') {
+                error_log('Gestio: SMTP_FROM absent en production — expéditeur invalide, le mail sera rejeté.');
+            }
+
+            $headers = "From: Gestio <$from>\r\n"
+                . "Reply-To: $from\r\n"
+                . "Content-Type: text/plain; charset=UTF-8";
+
+            // Le sujet contient des accents : sans encodage MIME (RFC 2047),
+            // les clients mail affichent du charabia.
+            $subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+
+            if (!@mail($email, $subject, $body, $headers) && getenv('APP_ENV') === 'production') {
+                error_log("Gestio: échec d'envoi du mail de reset à $email");
+            }
 
             // En développement : affiche le lien directement (pas de serveur mail requis).
             if (getenv('APP_ENV') !== 'production') {
